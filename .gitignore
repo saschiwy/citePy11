@@ -1,0 +1,7 @@
+﻿.vs
+out
+_ReSharper.Caches
+CMakeSettings.json
+tests.ipynb
+__pycache__
+demo.py
