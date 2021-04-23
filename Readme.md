@@ -11,7 +11,7 @@ The engine intends to create pybind11 bindings out of a CPP Interface Header.
 ~~~~
 pip install robotpy-cppheaderparser
 ~~~~ 
-- [pybind11](https://github.com/pybind/pybind11)
+- [pybind11](https://github.com/pybind/pybind11) With CMake Support (either via conda install or clone and build yourself)
 
 ## Install:
 - Fullfil the requirements
@@ -34,7 +34,9 @@ header.createBinding('citePyExample/citePyExample.cpp', 'citePyExample')
 ~~~~
 
 ### Install the library
-pip install .citePyExample
+~~~~
+pip install ./citePyExample
+~~~~
 
 ### Use it:
 ~~~~{.py}
