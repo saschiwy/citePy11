@@ -144,6 +144,15 @@ PYBIND11_MODULE(citePyExample, m)
 *
 * \param   cb  The cb.
 */)")
+		.def("addReferenced", [](CitePyExampleNS::IExample& self, double & result, double left, double right) {double __result = result;self.addReferenced(__result, left, right); return std::make_tuple(__result); }, R"(/*!
+* \fn  virtual void IExample::addReferenced(double& result, double left, double right) = 0;
+*
+* \brief   Adds a referenced
+*
+* \param [in,out]  result  The result.
+* \param           left    The left.
+* \param           right   The right.
+*/)")
 	;
 
 }

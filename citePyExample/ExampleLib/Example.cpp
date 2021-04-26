@@ -53,4 +53,9 @@ namespace CitePyExampleNS
     {
         _cb = std::move(cb);
     }
+
+    void Example::addReferenced(double& result, double left, double right)
+    {
+        result = add(left, right);
+    }
 }

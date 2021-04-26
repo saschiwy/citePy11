@@ -4,6 +4,7 @@
 binding
 """
 import os
+import re
 import CppHeaderParser as cp
 version = __version__ = "0.0.1"
 
@@ -24,6 +25,8 @@ class Argument():
     def __init__(self):
         self.name = ""
         self.type = ""
+        self.constant = False
+        self.reference = False
 
 class Method():
     """Represents a member method of a class
@@ -36,6 +39,7 @@ class Method():
         self.isConstructor = False
         self.arguments = []
         self.doxygen = ""
+        self.requireLambda = False
 
 class Property():
     """Represents a property or member variable of a class
@@ -95,7 +99,7 @@ class CitePy11():
                 self.classes.append(self.__parseClass__(cl))
             for d in self.header.typedefs:
                 self.typedefs.append(self.__parseTypedef__(d))
-        
+
         for c in self.classes:
             hasConstructor = False
             for m in c.methods:
@@ -163,11 +167,16 @@ PYBIND11_MODULE(""" + moduleName + """, m)
             for m in c.methods:
                 if not m.isStatic:
                     continue
-                content += '\t\t.def_property_readonly_static("' + m.name + '", [](py::object){return ' \
-                    + c.namespace + '::' + c.name + '::' + m.name + '('
+
+                content += '\t\t.def_property_readonly_static("' + m.name + '", [](py::object'
                 
                 for i, arg in enumerate(m.arguments):
-                    content += arg.type + ' ' + arg.name
+                    content += ', ' + arg.type + ' ' + arg.name
+                    
+                content += '){return ' + c.namespace + '::' + c.name + '::' + m.name + '('
+                
+                for i, arg in enumerate(m.arguments):
+                    content += arg.name
                     if i < len(m.arguments) - 1:
                         content += ', '
 
@@ -198,6 +207,8 @@ PYBIND11_MODULE(""" + moduleName + """, m)
                     continue
                 if m.isConstructor:
                     continue
+                if m.requireLambda:
+                    continue
                 content += '\t\t.def("' + m.name + '", py::overload_cast<'
                 
                 for i, arg in enumerate(m.arguments):
@@ -207,6 +218,45 @@ PYBIND11_MODULE(""" + moduleName + """, m)
                 
                 content += '>(&' + c.namespace + '::' + c.name + '::' + m.name + ')'
                 content += self.__addDescription__(m.doxygen) + ')\n'
+
+            ## Insert those with lambda wrapping
+            for m in c.methods:
+                if not m.requireLambda or m.isStatic:
+                    continue
+                
+                inOutVals = []
+
+                for arg in m.arguments:
+                    if(arg.reference and not arg.constant):
+                        inOutVals.append(arg)
+
+                content += '\t\t.def("{0}", []({1}::{2}& self'.format(m.name, c.namespace, c.name)
+                for arg in m.arguments:
+                    content += ', {} {}'.format(arg.type, arg.name)
+                content += ') {'
+                for arg in inOutVals:
+                    content += '{0} __{1} = {1}; '.format(arg.type.replace('&', '').strip(), arg.name.replace('&', '').strip())
+                
+                if m.returnType != 'void':
+                    content += 'const auto __returnCode = '
+                content += 'self.{0}('.format(m.name)
+                
+                for i, arg in enumerate(m.arguments):
+                    if arg in inOutVals:
+                        content += '__'
+                    content += arg.name
+                    if i < len(m.arguments) - 1:
+                        content += ', '
+
+                content += '); return std::make_tuple('
+                if m.returnType != 'void':
+                    content += '__returnCode, '
+                
+                for i, arg in enumerate(inOutVals):
+                    content += '__' + arg.name
+                    if i < len(inOutVals) - 1:
+                        content += ', '
+                content += '); }' + self.__addDescription__(m.doxygen) + ')\n'
 
             content += '\t;\n\n'
         # End
@@ -238,19 +288,31 @@ PYBIND11_MODULE(""" + moduleName + """, m)
         Returns:
             str: The full type with prefixes
         """
+        result  =  argType.replace('&', '').replace('*', '').replace('const', '').strip()
+
         try:
-            ind = [i for i, c in enumerate(self.classes) if c.name == argType]
-            return self.classes[ind[0]].namespace + '::' + self.classes[ind[0]].name
+            ind = [i for i, c in enumerate(self.classes) if c.name == result]
+            result = self.classes[ind[0]].namespace + '::' + self.classes[ind[0]].name
         except : None
         try:
-            ind = [i for i, e in enumerate(self.enums) if e.name == argType]
-            return self.enums[ind[0]].namespace + self.enums[ind[0]].name
+            ind = [i for i, e in enumerate(self.enums) if e.name == result]
+            result = self.enums[ind[0]].namespace + self.enums[ind[0]].name
         except : None
         try:
-            ind = [i for i, e in enumerate(self.typedefs) if e.name == argType]
-            return self.typedefs[ind[0]].fullName
+            ind = [i for i, e in enumerate(self.typedefs) if e.name == result]
+            result = self.typedefs[ind[0]].fullName
         except : None
-        return argType
+
+        if 'const' in argType:
+            result = 'const ' + result
+
+        for i in range(0,argType.count('&')):
+            result += '&'
+
+        for i in range(0,argType.count('*')):
+            result += '*'
+
+        return result
 
     def __parseEnum__(self, enumDictionary):
         """Parse an enum struct out of the dictionary Struct of CppHeaderParser
@@ -284,6 +346,8 @@ PYBIND11_MODULE(""" + moduleName + """, m)
         argument = Argument()
         argument.name = argDictonary['name']
         argument.type = argDictonary['type']
+        argument.constant = argDictonary['constant']
+        argument.reference = argDictonary['reference']
         return argument
 
     def __parseMethod__(self, methodDictionary):
@@ -296,18 +360,21 @@ PYBIND11_MODULE(""" + moduleName + """, m)
             Method: The parsed Method
         """
         method = Method()
-        method.name = methodDictionary['name']
-        method.returnType = methodDictionary['returns']
-        method.namespace = methodDictionary['namespace']
+        method.name = methodDictionary['name'].strip()
+        method.returnType = methodDictionary['returns'].strip()
+        method.namespace = methodDictionary['namespace'].strip()
         method.isStatic = methodDictionary['static']
 
         if 'doxygen' in methodDictionary:
-            method.doxygen = methodDictionary['doxygen']
+            method.doxygen = methodDictionary['doxygen'].strip()
         
         method.isConstructor = methodDictionary['constructor']
 
         for arg in methodDictionary['parameters']:
-            method.arguments.append(self.__parseArgument__(arg))
+            result = self.__parseArgument__(arg)
+            method.arguments.append(result)
+            if(result.reference and not result.constant):
+                method.requireLambda = True
         
         return method
 
@@ -345,6 +412,8 @@ PYBIND11_MODULE(""" + moduleName + """, m)
             cl.doxygen = self.header.classes[classDictionary]['doxygen']
 
         for method in self.header.classes[classDictionary]["methods"]["public"]:
+            if method['destructor'] or method['template']:
+                continue
             cl.methods.append(self.__parseMethod__(method))
 
         for prop in self.header.classes[classDictionary]["properties"]["public"]:
@@ -392,7 +461,6 @@ PYBIND11_MODULE(""" + moduleName + """, m)
             return ', R"('+ description + ')"'
         else:
             return ''
-        
 
 def parse(headerFile : list):
     """Creates the CitePy11 class and acceses parse method and then returing it.

@@ -19,6 +19,8 @@ namespace CitePyExampleNS
 
         void registerCallback(ExampleCallbackDefinition cb) override;
 
+        void addReferenced(double& result, double left, double right) override;
+
     private:
         ExampleCallbackDefinition _cb{nullptr};
     };

@@ -51,6 +51,12 @@ namespace CitePyExampleNS
          * \param   right   The right.
          */
         ExampleStruct(double left, double right);
+
+        template <typename T> void set(T val1, T val2)
+        {
+            left  = static_cast<double>(val1);
+            right = static_cast<double>(val2);
+        }
     };
 
     /*!
@@ -68,6 +74,9 @@ namespace CitePyExampleNS
     class IExample
     {
     public:
+
+        virtual ~IExample() = default;
+
         /*!
          * \fn  static std::unique_ptr<IExample> IExample::createLibrary();
          *
@@ -143,7 +152,17 @@ namespace CitePyExampleNS
          * \param   cb  The cb.
          */
         virtual void registerCallback(ExampleCallbackDefinition cb) = 0;
-        typedef std::function<void(double)> TestCb;
+
+        /*!
+         * \fn  virtual void IExample::addReferenced(double& result, double left, double right) = 0;
+         *
+         * \brief   Adds a referenced
+         *
+         * \param [in,out]  result  The result.
+         * \param           left    The left.
+         * \param           right   The right.
+         */
+        virtual void addReferenced(double& result, double left, double right) = 0;
     };
 }
 
