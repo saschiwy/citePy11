@@ -1,6 +1,9 @@
 #ifndef IEXAMPLE_H
 #define IEXAMPLE_H
+#include <functional>
 #include <memory>
+
+#include "AdditionalHeader.h"
 
 /*!
  * \namespace   CitePyExampleNS
@@ -9,6 +12,8 @@
  */
 namespace CitePyExampleNS
 {
+    typedef double SomeUselessTypeDef;
+
     /*!
      * \enum    ExampleEnum
      *
@@ -47,6 +52,13 @@ namespace CitePyExampleNS
          */
         ExampleStruct(double left, double right);
     };
+
+    /*!
+     * \typedef std::function<void(double)> ExampleCallbackDefinition
+     *
+     * \brief   Defines an alias representing the example callback definition
+     */
+    typedef std::function<void(double)> ExampleCallbackDefinition;
 
     /*!
      * \class   IExample
@@ -100,6 +112,38 @@ namespace CitePyExampleNS
          * \returns the result.
          */
         virtual double compute(ExampleEnum option, ExampleStruct values) = 0;
+
+        /*!
+         * \fn  virtual double IExample::compute(SecondNamespace::ExternalStruct values) = 0;
+         *
+         * \brief   Ass all the given values, inside the vector
+         *
+         * \param   values  The values.
+         *
+         * \returns A double.
+         */
+        virtual double compute(const std::vector<double>& values) = 0;
+
+        /*!
+         * \fn  virtual double IExample::compute(SecondNamespace::ExternalStruct values) = 0;
+         *
+         * \brief   Computes the given values
+         *
+         * \param   values  The values.
+         *
+         * \returns A double.
+         */
+        virtual double compute(SecondNamespace::ExternalStruct values) = 0;
+
+        /*!
+         * \fn  virtual void IExample::registerCallback(ExampleCallbackDefinition cb) = 0;
+         *
+         * \brief   Registers the callback described by cb
+         *
+         * \param   cb  The cb.
+         */
+        virtual void registerCallback(ExampleCallbackDefinition cb) = 0;
+        typedef std::function<void(double)> TestCb;
     };
 }
 

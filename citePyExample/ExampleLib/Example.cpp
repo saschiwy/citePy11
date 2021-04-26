@@ -1,4 +1,7 @@
 #include "Example.h"
+#include <numeric>
+
+#define RETURN_WITH_CB(value) if(_cb) _cb(value); return value
 
 namespace CitePyExampleNS
 {
@@ -17,12 +20,12 @@ namespace CitePyExampleNS
 
     double Example::add(double left, double right)
     {
-        return left + right;
+        RETURN_WITH_CB(left + right);
     }
 
     double Example::subtract(double left, double right)
     {
-        return left - right;
+        RETURN_WITH_CB(left - right);
     }
 
     double Example::compute(ExampleEnum option, ExampleStruct values)
@@ -33,6 +36,21 @@ namespace CitePyExampleNS
             case ExampleEnum::subtract: return subtract(values.left, values.right);
         }
 
-        return 0.0;
+        RETURN_WITH_CB(0.0);
+    }
+
+    double Example::compute(const std::vector<double>& values)
+    {
+        RETURN_WITH_CB(std::accumulate(values.begin(), values.end(), 0.0));
+    }
+
+    double Example::compute(SecondNamespace::ExternalStruct values)
+    {
+        return compute(values.listWithNumbersToAdd);
+    }
+
+    void Example::registerCallback(ExampleCallbackDefinition cb)
+    {
+        _cb = std::move(cb);
     }
 }

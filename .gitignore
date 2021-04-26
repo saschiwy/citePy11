@@ -5,3 +5,4 @@ CMakeSettings.json
 tests.ipynb
 __pycache__
 demo.py
+.vscode/settings.json

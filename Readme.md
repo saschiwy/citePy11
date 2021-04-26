@@ -27,9 +27,8 @@ pip install ./citePy11
 You find the example in the subfolder citePyExample. To create the binding use:
 
 ~~~~{.py}
-from citePy11 import CitePy11 as CitePy
-header = CitePy()
-header.parse('citePyExample/ExampleLib/IExample.h')
+import citePy11
+header  = citePy11.parse(['citePyExample/ExampleLib/AdditionalHeader.h', 'citePyExample/ExampleLib/IExample.h'])
 header.createBinding('citePyExample/citePyExample.cpp', 'citePyExample')
 ~~~~
 
@@ -51,3 +50,9 @@ print(lib.add(1.1, 1.2))
 >>> 2.0
 >>> 2.3
 ~~~~
+
+## Known Issues:
+- [Struct members with default initialiser lists are unparsed](https://github.com/robotpy/robotpy-cppheaderparser/issues/63)
+  - CitePy tries to workaround this issue by some specific line attriubte replacements, like it's done in Additional Header example
+- enum class is not detected as enum. CitePy11 resolves this by replacing 'enum class' with 'enum' only during parsing
+- [Class Internal Typedefs are not parsed](https://github.com/robotpy/robotpy-cppheaderparser/issues/68)

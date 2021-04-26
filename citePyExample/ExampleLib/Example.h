@@ -12,6 +12,15 @@ namespace CitePyExampleNS
         double subtract(double left, double right) override;
 
         double compute(ExampleEnum option, ExampleStruct values) override;
+
+        double compute(const std::vector<double>& values) override;
+
+        double compute(SecondNamespace::ExternalStruct values) override;
+
+        void registerCallback(ExampleCallbackDefinition cb) override;
+
+    private:
+        ExampleCallbackDefinition _cb{nullptr};
     };
 }
 #endif // EXAMPLE_H
