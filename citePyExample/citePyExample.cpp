@@ -76,7 +76,7 @@ PYBIND11_MODULE(citePyExample, m)
 
 	iExample
 		/// Static Methods
-		.def_property_readonly_static("createLibrary", [](py::object){return CitePyExampleNS::IExample::createLibrary();}, R"(/*!
+		.def_property_readonly_static("createLibrary", [](){return CitePyExampleNS::IExample::createLibrary();}, R"(/*!
 * \fn  static std::unique_ptr<IExample> IExample::createLibrary();
 *
 * \brief   Instantiates a library object without knowledge about the implementation
@@ -119,7 +119,7 @@ PYBIND11_MODULE(citePyExample, m)
 *
 * \returns the result.
 */)")
-		.def("compute", py::overload_cast<const std::vector<double> &>(&CitePyExampleNS::IExample::compute), R"(/*!
+		.def("compute", py::overload_cast<const std::vector<double>&>(&CitePyExampleNS::IExample::compute), R"(/*!
 * \fn  virtual double IExample::compute(SecondNamespace::ExternalStruct values) = 0;
 *
 * \brief   Ass all the given values, inside the vector
@@ -144,7 +144,7 @@ PYBIND11_MODULE(citePyExample, m)
 *
 * \param   cb  The cb.
 */)")
-		.def("addReferenced", [](CitePyExampleNS::IExample& self, double & result, double left, double right) {double __result = result;self.addReferenced(__result, left, right); return std::make_tuple(__result); }, R"(/*!
+		.def("addReferenced", [](CitePyExampleNS::IExample& self, double& result, double left, double right) {double __result = result; self.addReferenced(__result, left, right); return std::make_tuple(__result); }, R"(/*!
 * \fn  virtual void IExample::addReferenced(double& result, double left, double right) = 0;
 *
 * \brief   Adds a referenced
