@@ -168,10 +168,12 @@ PYBIND11_MODULE(""" + moduleName + """, m)
                 if not m.isStatic:
                     continue
 
-                content += '\t\t.def_property_readonly_static("' + m.name + '", [](py::object'
+                content += '\t\t.def_static("' + m.name + '", []('
                 
                 for i, arg in enumerate(m.arguments):
-                    content += ', ' + arg.type + ' ' + arg.name
+                    content += arg.type + ' ' + arg.name
+                    if i < len(m.arguments) - 1:
+                        content += ', '
                     
                 content += '){return ' + c.namespace + '::' + c.name + '::' + m.name + '('
                 
