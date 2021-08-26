@@ -40,6 +40,7 @@ class Method():
         self.arguments = []
         self.doxygen = ""
         self.requireLambda = False
+        self.isConst = False
 
 class Property():
     """Represents a property or member variable of a class
@@ -168,12 +169,10 @@ PYBIND11_MODULE(""" + moduleName + """, m)
                 if not m.isStatic:
                     continue
 
-                content += '\t\t.def_static("' + m.name + '", []('
+                content += '\t\t.def_property_readonly_static("' + m.name + '", [](py::object'
                 
                 for i, arg in enumerate(m.arguments):
-                    content += arg.type + ' ' + arg.name
-                    if i < len(m.arguments) - 1:
-                        content += ', '
+                    content += ', ' + arg.type + ' ' + arg.name
                     
                 content += '){return ' + c.namespace + '::' + c.name + '::' + m.name + '('
                 
@@ -218,7 +217,10 @@ PYBIND11_MODULE(""" + moduleName + """, m)
                     if i < len(m.arguments) - 1:
                         content += ', '
                 
-                content += '>(&' + c.namespace + '::' + c.name + '::' + m.name + ')'
+                content += '>(&' + c.namespace + '::' + c.name + '::' + m.name
+                if m.isConst:
+                    content += ", py::const_"
+                content += ')'
                 content += self.__addDescription__(m.doxygen) + ')\n'
 
             ## Insert those with lambda wrapping
@@ -366,7 +368,8 @@ PYBIND11_MODULE(""" + moduleName + """, m)
         method.returnType = methodDictionary['returns'].strip()
         method.namespace = methodDictionary['namespace'].strip()
         method.isStatic = methodDictionary['static']
-
+        method.isConst = methodDictionary['const']
+        
         if 'doxygen' in methodDictionary:
             method.doxygen = methodDictionary['doxygen'].strip()
         

@@ -57,6 +57,8 @@ namespace CitePyExampleNS
             left  = static_cast<double>(val1);
             right = static_cast<double>(val2);
         }
+
+        double getLeft() const;
     };
 
     /*!
@@ -96,7 +98,7 @@ namespace CitePyExampleNS
          *
          * \returns the result.
          */
-        virtual double add(double left, double right) = 0;
+        virtual double add(double left, double right) const = 0;
 
         /*!
          * \fn  virtual double IExample::subtract(double left, double right) = 0;

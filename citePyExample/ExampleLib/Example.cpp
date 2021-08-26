@@ -13,12 +13,17 @@ namespace CitePyExampleNS
         : left(left),
           right(right) {}
 
+    double ExampleStruct::getLeft() const
+    {
+        return left;
+    }
+
     std::unique_ptr<IExample> IExample::createLibrary()
     {
         return std::make_unique<Example>();
     }
 
-    double Example::add(double left, double right)
+    double Example::add(double left, double right) const
     {
         RETURN_WITH_CB(left + right);
     }

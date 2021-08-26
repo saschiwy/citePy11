@@ -72,6 +72,7 @@ PYBIND11_MODULE(citePyExample, m)
 */)")
 
 		/// Member Methods
+		.def("getLeft", py::overload_cast<>(&CitePyExampleNS::ExampleStruct::getLeft, py::const_))
 	;
 
 	iExample
@@ -89,7 +90,7 @@ PYBIND11_MODULE(citePyExample, m)
 		/// Constructors
 
 		/// Member Methods
-		.def("add", py::overload_cast<double, double>(&CitePyExampleNS::IExample::add), R"(/*!
+		.def("add", py::overload_cast<double, double>(&CitePyExampleNS::IExample::add, py::const_), R"(/*!
 * \fn  virtual double IExample::add(double left, double right) = 0;
 *
 * \brief   Adds two doubles
@@ -119,7 +120,7 @@ PYBIND11_MODULE(citePyExample, m)
 *
 * \returns the result.
 */)")
-		.def("compute", py::overload_cast<const std::vector<double> &>(&CitePyExampleNS::IExample::compute), R"(/*!
+		.def("compute", py::overload_cast<const std::vector<double>&>(&CitePyExampleNS::IExample::compute), R"(/*!
 * \fn  virtual double IExample::compute(SecondNamespace::ExternalStruct values) = 0;
 *
 * \brief   Ass all the given values, inside the vector
@@ -144,7 +145,7 @@ PYBIND11_MODULE(citePyExample, m)
 *
 * \param   cb  The cb.
 */)")
-		.def("addReferenced", [](CitePyExampleNS::IExample& self, double & result, double left, double right) {double __result = result;self.addReferenced(__result, left, right); return std::make_tuple(__result); }, R"(/*!
+		.def("addReferenced", [](CitePyExampleNS::IExample& self, double& result, double left, double right) {double __result = result; self.addReferenced(__result, left, right); return std::make_tuple(__result); }, R"(/*!
 * \fn  virtual void IExample::addReferenced(double& result, double left, double right) = 0;
 *
 * \brief   Adds a referenced

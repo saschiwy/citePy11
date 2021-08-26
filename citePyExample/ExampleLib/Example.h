@@ -7,7 +7,7 @@ namespace CitePyExampleNS
     class Example : public IExample
     {
     public:
-        double add(double left, double right) override;
+        double add(double left, double right) const override;
 
         double subtract(double left, double right) override;
 
