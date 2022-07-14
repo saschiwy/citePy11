@@ -15,7 +15,6 @@ setup(
     long_description=open('Readme.md').read(),
     install_requires=[
        "robotpy-cppheaderparser",
-       "pybind11",
    ],
    license='LICENSE',
    packages=['citePy11'],

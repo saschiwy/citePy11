@@ -6,3 +6,7 @@ tests.ipynb
 __pycache__
 demo.py
 .vscode/settings.json
+.idea
+citePy11/extern
+citePyExample/extern
+build

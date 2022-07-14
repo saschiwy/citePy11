@@ -20,24 +20,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required(VERSION 3.14)
 
-project ("citePyExample")
+project("citePyExample")
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(VERSION 0.0.1)
+if (UNIX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pthread -fPIC")
+endif ()
 
-if(UNIX)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pthread")
-endif()
+find_package(Python COMPONENTS Interpreter Development)
 
-find_package(pybind11 REQUIRED)
-
+add_subdirectory(extern/pybind11)
 add_subdirectory(ExampleLib)
 
-include_directories("./")
 include_directories(ExampleLib)
 
 PYBIND11_ADD_MODULE(citePyExample citePyExample.cpp)
 target_link_libraries(citePyExample PRIVATE ExampleLib)
+
+message(STATUS ${Python_SITELIB})
+
+INSTALL(TARGETS citePyExample
+        COMPONENT library
+        DESTINATION ${Python_SITELIB})
