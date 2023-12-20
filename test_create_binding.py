@@ -1,5 +1,9 @@
-import citePy11
+from citePy11 import CitePy11
 
+header = CitePy11(header_files=['citePyExample/ExampleLib/AdditionalHeader.h',
+                                'citePyExample/ExampleLib/IExample.h'])
 
-header = citePy11.parse(['citePyExample/ExampleLib/AdditionalHeader.h', 'citePyExample/ExampleLib/IExample.h'])
-header.create_binding('citePyExample/citePyExample.cpp', 'citePyExample')
+cpp = header.create_cpp('citePyExample')
+
+with open(f'citePyExample/citePyExample.cpp', 'w') as f:
+    f.write(cpp)

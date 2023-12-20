@@ -10,3 +10,5 @@ demo.py
 citePy11/extern
 citePyExample/extern
 build
+venv
+/citePyExample/cmake-build-debug/

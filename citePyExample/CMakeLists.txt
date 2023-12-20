@@ -24,11 +24,11 @@ cmake_minimum_required(VERSION 3.14)
 
 project("citePyExample")
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(VERSION 0.0.1)
 if (UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pthread -fPIC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -pthread -fPIC")
 endif ()
 
 find_package(Python COMPONENTS Interpreter Development)

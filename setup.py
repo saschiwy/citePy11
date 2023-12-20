@@ -8,13 +8,14 @@ from setuptools.command.build_ext import build_ext
 
 setup(
     name="citePy11",
-    version="0.0.1",
+    version="0.1.0",
     author="Sascha Schiwy",
     author_email="sascha.schiwy@gmail.com",
     description="Create pybind11 bindings out of a CPP Interface Header.",
     long_description=open('Readme.md').read(),
     install_requires=[
-       "robotpy-cppheaderparser",
+       "cxxheaderparser",
+       "pybind11",
    ],
    license='LICENSE',
    packages=['citePy11'],

@@ -1,5 +1,5 @@
-#ifndef IEXAMPLE_H
-#define IEXAMPLE_H
+#pragma once
+
 #include <functional>
 #include <memory>
 
@@ -76,7 +76,6 @@ namespace CitePyExampleNS
     class IExample
     {
     public:
-
         virtual ~IExample() = default;
 
         /*!
@@ -167,5 +166,3 @@ namespace CitePyExampleNS
         virtual void addReferenced(double& result, double left, double right) = 0;
     };
 }
-
-#endif // IEXAMPLE_H
