@@ -64,6 +64,7 @@ class CitePyExampleNS:
         def __init__(self, left, right):
             self.__m__ = cpp_m.CitePyExampleNS_ExampleStruct(left, right)
 
+
         def set(self, val1, val2):
             return self.__m__.set(val1, val2)
 

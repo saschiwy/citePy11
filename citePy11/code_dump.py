@@ -1,11 +1,14 @@
+from citePy11.citepy_config import citepy_config
+
+
 class CodeDump:
 
-    def __init__(self):
-        self.no_doc = True
+    def __init__(self, config: citepy_config):
         self.full_names = {}
+        self.config = config
 
     def __add_description__(self, description):
-        if self.no_doc or description is None:
+        if self.config.no_cpp_doc or description is None:
             return ''
         elif len(description) > 0:
             return ', R"(' + description + ')"'
@@ -349,10 +352,8 @@ sys.path.append(script_path)
         for e in c.enums:
             result = self.__get_python_enum__(result, e, nested_prefix + '    ')
 
-        has_default_constructor = self.__has_default_constructor__(c)
-        if not has_default_constructor:
-            result += nested_prefix + '    def __init__(self):\n'
-            result += f'{nested_prefix}        self.__m__ = cpp_m.{self.__get_full_pybind_name__(name)}()\n\n'
+        if not self.__has_default_constructor__(c):
+            result += self.__add_python_constructor__(name, nested_prefix + '    ')
 
         for e in c.fields:
             result = self.__get_python_field__(result, e, f'{nested_prefix}    ')
@@ -386,42 +387,33 @@ sys.path.append(script_path)
             return result
 
         if m.constructor:
-            name = '__init__'
+            result += self.__add_python_constructor__(class_name, nested_prefix + '    ', m.parameters)
         else:
             name = m.name.segments[0].name
+            result += f'{nested_prefix}    def {name}(self'
 
-        result += f'{nested_prefix}    def {name}(self'
-
-        for i, arg in enumerate(m.parameters):
-            result += ', ' + arg.name
-
-        result += '):\n'
-
-        if m.constructor:
-            result += f'{nested_prefix}        self.__m__ = cpp_m.{self.__get_full_pybind_name__(m.name.segments[0].name)}('
             for i, arg in enumerate(m.parameters):
-                result += arg.name
-                if i < len(m.parameters) - 1:
-                    result += ', '
-            result += ')\n'
+                result += ', ' + arg.name
 
-        elif m.static:
-            result += f'{nested_prefix}        return cpp_m.{self.__get_full_pybind_name__(class_name)}.{name}('
-            for i, arg in enumerate(m.parameters):
-                result += arg.name
-                if i < len(m.parameters) - 1:
-                    result += ', '
+            result += '):\n'
 
-            result += ')\n'
+            if m.static:
+                result += f'{nested_prefix}        return cpp_m.{self.__get_full_pybind_name__(class_name)}.{name}('
+                for i, arg in enumerate(m.parameters):
+                    result += arg.name
+                    if i < len(m.parameters) - 1:
+                        result += ', '
 
-        else:
-            result += f'{nested_prefix}        return self.__m__.{name}('
-            for i, arg in enumerate(m.parameters):
-                result += arg.name
-                if i < len(m.parameters) - 1:
-                    result += ', '
+                result += ')\n'
 
-            result += ')\n'
+            else:
+                result += f'{nested_prefix}        return self.__m__.{name}('
+                for i, arg in enumerate(m.parameters):
+                    result += arg.name
+                    if i < len(m.parameters) - 1:
+                        result += ', '
+
+                result += ')\n'
 
         return result + '\n'
 
@@ -458,3 +450,24 @@ sys.path.append(script_path)
             if m.constructor and len(m.parameters) == 0:
                 return True
         return False
+
+    def __add_python_constructor__(self, name, nested_prefix, params=None):
+
+        if params is None:
+            params = []
+
+        result = nested_prefix + 'def __init__(self'
+
+        for i, arg in enumerate(params):
+            result += ', ' + arg.name
+
+        result += '):\n'
+        result += f'{nested_prefix}    self.__m__ = cpp_m.{self.__get_full_pybind_name__(name)}('
+
+        for i, arg in enumerate(params):
+            result += arg.name
+            if i < len(params) - 1:
+                result += ', '
+
+        result += ')\n\n'
+        return result

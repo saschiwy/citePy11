@@ -8,6 +8,7 @@ import os
 import re
 from cxxheaderparser.simple import parse_string
 from citePy11.code_dump import CodeDump
+from citePy11.citepy_config import citepy_config
 
 version = __version__ = "0.1.0"
 
@@ -17,15 +18,16 @@ class CitePy11:
     This class is the main entry Point for the functionality!
     """
 
-    def __init__(self, header_files):
+    def __init__(self, config: citepy_config):
         """
         Initialize the InterfaceHeader class with the path to the desired Header File
         """
-        self.header_files = header_files
+        self.config = config
+        self.header_files = config.header_files
         self.filenames = []
         self.contents = []
 
-        self.dump = CodeDump()
+        self.dump = CodeDump(self.config)
         self.dump.no_doc = True
 
         self.__parse__()
