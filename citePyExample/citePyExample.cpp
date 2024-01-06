@@ -17,24 +17,24 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(citePyExample, m) {
-py::enum_<SecondNamespace::ExternalStruct::Test> (m, "Test")
+PYBIND11_MODULE(__citePyExample__, m) {
+py::enum_<SecondNamespace::ExternalStruct::Test> (m, "SecondNamespace_ExternalStruct_Test")
 	.value("a", SecondNamespace::ExternalStruct::Test::a)
 	.value("b", SecondNamespace::ExternalStruct::Test::b)
 	.export_values();
 
-py::class_<SecondNamespace::ExternalStruct> (m, "ExternalStruct")
+py::class_<SecondNamespace::ExternalStruct> (m, "SecondNamespace_ExternalStruct")
 .def_readwrite("testEnum", &SecondNamespace::ExternalStruct::testEnum)
 .def_readwrite("exampleDouble", &SecondNamespace::ExternalStruct::exampleDouble)
 .def_readwrite("listWithNumbersToAdd", &SecondNamespace::ExternalStruct::listWithNumbersToAdd)
 .def(py::init<>());
 
-py::enum_<CitePyExampleNS::ExampleEnum> (m, "ExampleEnum")
+py::enum_<CitePyExampleNS::ExampleEnum> (m, "CitePyExampleNS_ExampleEnum")
 	.value("add", CitePyExampleNS::ExampleEnum::add)
 	.value("subtract", CitePyExampleNS::ExampleEnum::subtract)
 	.export_values();
 
-py::class_<CitePyExampleNS::ExampleStruct> (m, "ExampleStruct")
+py::class_<CitePyExampleNS::ExampleStruct> (m, "CitePyExampleNS_ExampleStruct")
 .def_readwrite("left", &CitePyExampleNS::ExampleStruct::left)
 .def_readwrite("right", &CitePyExampleNS::ExampleStruct::right)
 .def(py::init<>())
@@ -42,7 +42,7 @@ py::class_<CitePyExampleNS::ExampleStruct> (m, "ExampleStruct")
 .def("getLeft", py::overload_cast<>(&CitePyExampleNS::ExampleStruct::getLeft, py::const_))
 ;
 
-py::class_<CitePyExampleNS::IExample> (m, "IExample")
+py::class_<CitePyExampleNS::IExample> (m, "CitePyExampleNS_IExample")
 .def_static("createLibrary", py::overload_cast<>(&CitePyExampleNS::IExample::createLibrary))
 .def("add", py::overload_cast<double, double>(&CitePyExampleNS::IExample::add, py::const_))
 .def("subtract", py::overload_cast<double, double>(&CitePyExampleNS::IExample::subtract))

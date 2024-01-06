@@ -38,11 +38,11 @@ add_subdirectory(ExampleLib)
 
 include_directories(ExampleLib)
 
-PYBIND11_ADD_MODULE(citePyExample citePyExample.cpp)
-target_link_libraries(citePyExample PRIVATE ExampleLib)
+PYBIND11_ADD_MODULE(__citePyExample__ citePyExample.cpp)
+target_link_libraries(__citePyExample__ PRIVATE ExampleLib)
 
 message(STATUS ${Python_SITELIB})
 
-INSTALL(TARGETS citePyExample
+INSTALL(TARGETS __citePyExample__
         COMPONENT library
         DESTINATION ${Python_SITELIB})

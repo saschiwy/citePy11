@@ -82,3 +82,13 @@ class CitePy11:
         result = self.dump.add_functions(result, content.functions, namespace_prefix)
         result = self.dump.add_classes(result, content.classes, namespace_prefix)
         return result
+
+    def create_python(self, module_name):
+        """
+        Create the python content, of all files
+        """
+
+        result = self.dump.get_python_head(module_name)
+        result = self.dump.get_python_content(result, self.contents)
+
+        return result

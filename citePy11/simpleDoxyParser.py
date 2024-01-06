@@ -49,8 +49,8 @@ def parse_doxygen_comment(comment):
     if len(comment) == 0:
         return parsed_data
 
-    current_pos = find_next_tag_pos(comment, 0)
-    next_pos = find_next_tag_pos(comment, current_pos + 1)
+    current_pos = __find_next_tag_pos__(comment, 0)
+    next_pos = __find_next_tag_pos__(comment, current_pos + 1)
 
     first_content = __make_single_line__(comment[0:current_pos - 1])
     if len(first_content) > 0:
@@ -73,12 +73,12 @@ def parse_doxygen_comment(comment):
             break
 
         current_pos = next_pos
-        next_pos = find_next_tag_pos(comment, current_pos + 1)
+        next_pos = __find_next_tag_pos__(comment, current_pos + 1)
 
     return parsed_data
 
 
-def find_next_tag_pos(comment, current_pos):
+def __find_next_tag_pos__(comment, current_pos):
     next_pos = len(comment)
     for tag in known_tags:
         for ts in tag_start:
