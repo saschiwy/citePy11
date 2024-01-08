@@ -45,9 +45,19 @@ class SecondNamespace:
 
 
 class CitePyExampleNS:
+    class ExampleEnum(enum.Enum):
+        add = 0
+        subtract = 1
+
     class ExampleStruct:
+        """
+        An example structure.
+        
+        """
+        
         @property
         def left(self):
+            """ The left"""
             return self.__m__.left
 
         @left.setter
@@ -56,13 +66,33 @@ class CitePyExampleNS:
 
         @property
         def right(self):
+            """ The right"""
             return self.__m__.right
 
         @right.setter
         def right(self, value):
             self.__m__.right = value
 
+        def __init__(self):
+            """
+            Default constructor
+            
+            :fn: ExampleStruct();
+            """
+            
+            self.__m__ = cpp_m.CitePyExampleNS_ExampleStruct()
+        
+        
         def __init__(self, left, right):
+            """
+            Constructor
+            
+            :param left: The left.
+            :param right: The right.
+            
+            :fn: ExampleStruct(double left, double right);
+            """
+            
             self.__m__ = cpp_m.CitePyExampleNS_ExampleStruct(left, right)
         
         
@@ -75,37 +105,82 @@ class CitePyExampleNS:
 
     class IExample:
         """
-        This is a test class
+        An example class to show the usage ot citePy
+        
         """
+        
         def __init__(self):
             self.__m__ = cpp_m.CitePyExampleNS_IExample.createLibrary()
 
         def add(self, left, right):
             """
-            Adds two numbers together
-
-            :param left: The left number
-            :param right: The right number
-
-            :fn: int add(int left, int right)
-
-            :return: The sum of the two numbers
+            Adds two doubles
+            
+            :param left: The left.
+            :param right: The right.
+            
+            :fn: virtual double IExample::add(double left, double right) = 0;
             """
+            
             return self.__m__.add(left, right)
         
         def subtract(self, left, right):
+            """
+            Subtracts two doubles
+            
+            :param left: The left.
+            :param right: The right.
+            
+            :fn: virtual double IExample::subtract(double left, double right) = 0;
+            """
+            
             return self.__m__.subtract(left, right)
         
         def compute(self, option, values):
+            """
+            Computes
+            
+            :param option: The option.
+            :param values: The values.
+            
+            :fn: virtual double IExample::compute(ExampleEnum option, ExampleStruct values) = 0;
+            """
+            
             return self.__m__.compute(option, values)
         
         def compute(self, values):
+            """
+            Ass all the given values, inside the vector
+            
+            :param values: The values.
+            
+            :fn: virtual double IExample::compute(SecondNamespace::ExternalStruct values) = 0;
+            """
+            
             return self.__m__.compute(values)
         
         def registerCallback(self, cb):
+            """
+            Registers the callback described by cb
+            
+            :param cb: The cb.
+            
+            :fn: virtual void IExample::registerCallback(ExampleCallbackDefinition cb) = 0;
+            """
+            
             return self.__m__.registerCallback(cb)
         
         def addReferenced(self, result, left, right):
+            """
+            Adds a referenced
+            
+            :param result: The result.
+            :param left: The left.
+            :param right: The right.
+            
+            :fn: virtual void IExample::addReferenced(double& result, double left, double right) = 0;
+            """
+            
             return self.__m__.addReferenced(result, left, right)
         
 

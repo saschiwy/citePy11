@@ -1,4 +1,5 @@
 from citePy11.citepy_config import citepy_config
+from citePy11.simpleDoxyParser import *
 
 
 class CodeDump:
@@ -328,12 +329,12 @@ sys.path.append(script_path)
             result += f'{nested_prefix}class {content.name}:\n'
             nested_prefix = nested_prefix + '    '
 
+        for c in content.enums:
+            result = self.__get_python_enum__(result, c, nested_prefix)
+
         for c in content.classes:
             result = self.__get_python_class__(result, c, nested_prefix)
 
-        # for c in content.enums:
-        #     result += self.__get_python_enum__(result, c)
-        #
         # for c in content.functions:
         #     result += self.__get_python_function__(result, c)
 
@@ -346,6 +347,11 @@ sys.path.append(script_path)
     def __get_python_class__(self, result, c, nested_prefix):
         name = c.class_decl.typename.segments[0].name
         result += f'{nested_prefix}class {name}:\n'
+
+        if c.class_decl.doxygen is not None:
+            doc = create_method_docstring(parse_doxygen_comment(c.class_decl.doxygen))
+            for li in doc.split('\n'):
+                result += f'{nested_prefix}    {li}\n'
 
         for e in c.classes:
             result = self.__get_python_class__(result, e, nested_prefix + '    ')
@@ -390,9 +396,6 @@ sys.path.append(script_path)
         if m.destructor:
             return result
 
-        if m.constructor and len(m.parameters) == 0:
-            return result
-
         name = m.name.segments[0].name
         full_method_name = self.__get_full_cpp_method_name__(m, class_name)
         if full_method_name in self.config.methods_to_ignore:
@@ -416,6 +419,12 @@ sys.path.append(script_path)
 
         result += f'{nested_prefix}@property\n'
         result += f'{nested_prefix}def {name}(self):\n'
+
+        if (e.doxygen is not None):
+            doc = create_field_docstring(e.doxygen)
+            for li in doc.split('\n'):
+                result += f'{nested_prefix}    {li}\n'
+
         result += f'{nested_prefix}    return self.__m__.{name}\n\n'
 
         result += f'{nested_prefix}@{name}.setter\n'
@@ -442,7 +451,7 @@ sys.path.append(script_path)
                 return True
         return False
 
-    def __add_python_constructor__(self, name, params=None):
+    def __add_python_constructor__(self, name, params=None, docstring=None):
 
         if params is None:
             params = []
@@ -453,6 +462,11 @@ sys.path.append(script_path)
             result += ', ' + arg.name
 
         result += '):\n'
+
+        if docstring is not None:
+            for li in docstring.split('\n'):
+                result += f'    {li}\n'
+
         result += f'    self.__m__ = cpp_m.{self.__get_full_pybind_name__(name)}('
 
         for i, arg in enumerate(params):
@@ -490,8 +504,13 @@ sys.path.append(script_path)
 
     def __create_python_method__(self, m, name, class_name):
         result = ''
+
+        docstring = None
+        if m.doxygen is not None:
+            docstring = create_method_docstring(parse_doxygen_comment(m.doxygen))
+
         if m.constructor:
-            result += self.__add_python_constructor__(class_name, m.parameters)
+            result += self.__add_python_constructor__(class_name, m.parameters, docstring)
         else:
             result += f'def {name}(self'
 
@@ -499,6 +518,10 @@ sys.path.append(script_path)
                 result += ', ' + arg.name
 
             result += '):\n'
+
+            if docstring is not None:
+                for li in docstring.split('\n'):
+                    result += f'    {li}\n'
 
             if m.static:
                 result += f'    return cpp_m.{self.__get_full_pybind_name__(class_name)}.{name}('
