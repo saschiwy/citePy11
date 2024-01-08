@@ -6,6 +6,7 @@ class CodeDump:
     def __init__(self, config: citepy_config):
         self.full_names = {}
         self.config = config
+        self.existing_methods = []
 
     def __add_description__(self, description):
         if self.config.no_cpp_doc or description is None:
@@ -352,12 +353,18 @@ sys.path.append(script_path)
         for e in c.enums:
             result = self.__get_python_enum__(result, e, nested_prefix + '    ')
 
-        if not self.__has_default_constructor__(c):
-            result += self.__add_python_constructor__(name, nested_prefix + '    ')
+        if not self.__has_default_constructor__(c) and not self.__has_custom_constructor__(c):
+            constr = self.__add_python_constructor__(name)
+            for l in constr.split('\n'):
+                result += nested_prefix + l + '\n'
+
+        if self.__has_custom_constructor__(c):
+            result += self.__add_python_custom_constructor__(c, nested_prefix + '    ')
 
         for e in c.fields:
             result = self.__get_python_field__(result, e, f'{nested_prefix}    ')
 
+        self.existing_methods = []
         for m in c.methods:
             result = self.__get_python_method__(result, m, nested_prefix, name)
 
@@ -386,36 +393,20 @@ sys.path.append(script_path)
         if m.constructor and len(m.parameters) == 0:
             return result
 
-        if m.constructor:
-            result += self.__add_python_constructor__(class_name, nested_prefix + '    ', m.parameters)
-        else:
-            name = m.name.segments[0].name
-            result += f'{nested_prefix}    def {name}(self'
+        name = m.name.segments[0].name
+        full_method_name = self.__get_full_cpp_method_name__(m, class_name)
+        if full_method_name in self.config.methods_to_ignore:
+            return result
 
-            for i, arg in enumerate(m.parameters):
-                result += ', ' + arg.name
+        method_string = self.__create_python_method__(m, name, class_name)
+        if method_string in self.existing_methods:
+            return result
 
-            result += '):\n'
+        self.existing_methods.append(method_string)
+        for l in method_string.split('\n'):
+            result += nested_prefix + '    ' + l + '\n'
 
-            if m.static:
-                result += f'{nested_prefix}        return cpp_m.{self.__get_full_pybind_name__(class_name)}.{name}('
-                for i, arg in enumerate(m.parameters):
-                    result += arg.name
-                    if i < len(m.parameters) - 1:
-                        result += ', '
-
-                result += ')\n'
-
-            else:
-                result += f'{nested_prefix}        return self.__m__.{name}('
-                for i, arg in enumerate(m.parameters):
-                    result += arg.name
-                    if i < len(m.parameters) - 1:
-                        result += ', '
-
-                result += ')\n'
-
-        return result + '\n'
+        return result
 
     def __get_python_field__(self, result, e, nested_prefix):
         if e.access != 'public':
@@ -451,18 +442,18 @@ sys.path.append(script_path)
                 return True
         return False
 
-    def __add_python_constructor__(self, name, nested_prefix, params=None):
+    def __add_python_constructor__(self, name, params=None):
 
         if params is None:
             params = []
 
-        result = nested_prefix + 'def __init__(self'
+        result = 'def __init__(self'
 
         for i, arg in enumerate(params):
             result += ', ' + arg.name
 
         result += '):\n'
-        result += f'{nested_prefix}    self.__m__ = cpp_m.{self.__get_full_pybind_name__(name)}('
+        result += f'    self.__m__ = cpp_m.{self.__get_full_pybind_name__(name)}('
 
         for i, arg in enumerate(params):
             result += arg.name
@@ -470,4 +461,61 @@ sys.path.append(script_path)
                 result += ', '
 
         result += ')\n\n'
+        return result
+
+    def __has_custom_constructor__(self, c):
+        name = c.class_decl.typename.segments[0].name
+        if name in self.full_names:
+            name = self.full_names[name]
+        else:
+            return False
+        if name in self.config.custom_python_constructor:
+            return True
+        else:
+            return False
+
+    def __add_python_custom_constructor__(self, c, nested_prefix):
+        name = c.class_decl.typename.segments[0].name
+        result = nested_prefix + 'def __init__(self):\n'
+        result += f'{nested_prefix}    {self.config.custom_python_constructor[self.full_names[name]]}\n\n'
+        return result
+
+    def __get_full_cpp_method_name__(self, m, class_name):
+        name = m.name.segments[0].name
+        if class_name not in self.full_names:
+            return name
+
+        full_class_name = self.full_names[class_name]
+        return full_class_name + '::' + name
+
+    def __create_python_method__(self, m, name, class_name):
+        result = ''
+        if m.constructor:
+            result += self.__add_python_constructor__(class_name, m.parameters)
+        else:
+            result += f'def {name}(self'
+
+            for i, arg in enumerate(m.parameters):
+                result += ', ' + arg.name
+
+            result += '):\n'
+
+            if m.static:
+                result += f'    return cpp_m.{self.__get_full_pybind_name__(class_name)}.{name}('
+                for i, arg in enumerate(m.parameters):
+                    result += arg.name
+                    if i < len(m.parameters) - 1:
+                        result += ', '
+
+                result += ')\n'
+
+            else:
+                result += f'    return self.__m__.{name}('
+                for i, arg in enumerate(m.parameters):
+                    result += arg.name
+                    if i < len(m.parameters) - 1:
+                        result += ', '
+
+                result += ')\n'
+
         return result

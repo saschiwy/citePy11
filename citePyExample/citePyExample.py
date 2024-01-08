@@ -15,9 +15,10 @@ class SecondNamespace:
             a = 0
             b = 1
 
-        def __init__(self):
-            self.__m__ = cpp_m.SecondNamespace_ExternalStruct()
-
+    def __init__(self):
+        self.__m__ = cpp_m.SecondNamespace_ExternalStruct()
+    
+    
         @property
         def testEnum(self):
             return self.__m__.testEnum
@@ -63,41 +64,48 @@ class CitePyExampleNS:
 
         def __init__(self, left, right):
             self.__m__ = cpp_m.CitePyExampleNS_ExampleStruct(left, right)
-
-
+        
+        
         def set(self, val1, val2):
             return self.__m__.set(val1, val2)
-
+        
         def getLeft(self):
             return self.__m__.getLeft()
-
+        
 
     class IExample:
+        """
+        This is a test class
+        """
         def __init__(self):
-            self.__m__ = cpp_m.CitePyExampleNS_IExample()
-
-        def createLibrary(self):
-            return cpp_m.CitePyExampleNS_IExample.createLibrary()
+            self.__m__ = cpp_m.CitePyExampleNS_IExample.createLibrary()
 
         def add(self, left, right):
-            return self.__m__.add(left, right)
+            """
+            Adds two numbers together
 
+            :param left: The left number
+            :param right: The right number
+
+            :fn: int add(int left, int right)
+
+            :return: The sum of the two numbers
+            """
+            return self.__m__.add(left, right)
+        
         def subtract(self, left, right):
             return self.__m__.subtract(left, right)
-
+        
         def compute(self, option, values):
             return self.__m__.compute(option, values)
-
+        
         def compute(self, values):
             return self.__m__.compute(values)
-
-        def compute(self, values):
-            return self.__m__.compute(values)
-
+        
         def registerCallback(self, cb):
             return self.__m__.registerCallback(cb)
-
+        
         def addReferenced(self, result, left, right):
             return self.__m__.addReferenced(result, left, right)
-
+        
 

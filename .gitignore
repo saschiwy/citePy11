@@ -12,3 +12,4 @@ citePyExample/extern
 build
 venv
 /citePyExample/cmake-build-debug/
+/citePy11.egg-info
