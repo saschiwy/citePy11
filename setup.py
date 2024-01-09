@@ -14,9 +14,9 @@ setup(
     description="Create pybind11 bindings out of a CPP Interface Header.",
     long_description=open('Readme.md').read(),
     install_requires=[
-       "cxxheaderparser",
-       "pybind11",
-   ],
-   license='LICENSE',
-   packages=['citePy11'],
+        "cxxheaderparser",
+        "pybind11",
+    ],
+    license='LICENSE',
+    packages=['citePy11'],
 )

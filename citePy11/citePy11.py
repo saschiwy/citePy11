@@ -7,7 +7,8 @@ binding
 import os
 import re
 from cxxheaderparser.simple import parse_string
-from citePy11.code_dump import CodeDump
+from citePy11.code_dump_cpp import CodeDumpCpp
+from citePy11.code_dump_py import CodeDumpPy
 from citePy11.citepy_config import citepy_config
 
 version = __version__ = "0.1.0"
@@ -27,8 +28,8 @@ class CitePy11:
         self.filenames = []
         self.contents = []
 
-        self.dump = CodeDump(self.config)
-        self.dump.no_doc = True
+        self.dump_cpp = CodeDumpCpp(self.config)
+        self.dump_cpp.no_doc = True
 
         self.__parse__()
 
@@ -53,12 +54,12 @@ class CitePy11:
         Create the cpp content, of all files
         """
 
-        result = self.dump.get_cpp_head(self.filenames)
-        result = self.dump.add_module(result, module_name)
+        result = self.dump_cpp.get_cpp_head(self.filenames)
+        result = self.dump_cpp.add_module(result, module_name)
 
         for i in range(len(self.filenames)):
             result += self.__create_cpp__(self.contents[i], self.filenames[i])
-        result = self.dump.close_module(result)
+        result = self.dump_cpp.close_module(result)
         return result
 
     def __create_cpp__(self, content, header_file):
@@ -79,10 +80,10 @@ class CitePy11:
         return result
 
     def __add_namespace__(self, result, content, namespace_prefix):
-        self.dump.find_typedefs(content, namespace_prefix)
-        result = self.dump.add_enums(result, content.enums, namespace_prefix)
-        result = self.dump.add_functions(result, content.functions, namespace_prefix)
-        result = self.dump.add_classes(result, content.classes, namespace_prefix)
+        self.dump_cpp.find_typedefs(content, namespace_prefix)
+        result = self.dump_cpp.add_enums(result, content.enums, namespace_prefix)
+        result = self.dump_cpp.add_functions(result, content.functions, namespace_prefix)
+        result = self.dump_cpp.add_classes(result, content.classes, namespace_prefix)
         return result
 
     def create_python(self, module_name):
@@ -90,7 +91,9 @@ class CitePy11:
         Create the python content, of all files
         """
 
-        result = self.dump.get_python_head(module_name)
-        result = self.dump.get_python_content(result, self.contents)
+        dump_py = CodeDumpPy(self.dump_cpp, self.config)
+
+        result = dump_py.get_python_head(module_name)
+        result += dump_py.get_python_content(result, self.contents)
 
         return result

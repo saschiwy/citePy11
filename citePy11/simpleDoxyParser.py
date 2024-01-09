@@ -110,6 +110,8 @@ def create_method_docstring(parsed_doc):
     if len(parsed_doc['return']) > 0:
         result += f':return: {parsed_doc["return"]}\n'
 
+    if result[-1] == '\n':
+        result = result[:-1]
     result += '"""\n'
     return result
 
@@ -118,7 +120,7 @@ def create_field_docstring(parsed_doc):
     for field_comment in field_comments:
         parsed_doc = parsed_doc.replace(field_comment, '')
 
-    result = '"""' + parsed_doc + '"""'
+    result = '"""' + parsed_doc.strip() + '"""'
     return result
 
 
