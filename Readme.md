@@ -2,63 +2,26 @@
 
 ## Introduction
 
-The engine intends to create pybind11 bindings out of a CPP Interface Header.
+The engine intends to create pybind11 bindings out of a CPP Interface Header and also if desired a python mapper to add
+support for IDE development
 
 ## Required Software
 
 - CMake >= 3.14
 - A CMake compatible compiler
 - python >= 3.7
-- [robotpy CppHeaderParser](https://github.com/robotpy/robotpy-cppheaderparser)
+- [pybind11](https://github.com/pybind/pybind11) is added by CMake automatically
 
 ~~~~
-pip install robotpy-cppheaderparser
+pip install -r requirements.txt
 ~~~~ 
 
-- [pybind11](https://github.com/pybind/pybind11) is added via submodule
+## Getting started:
 
-## Getting Started:
-
-- Clone this repo
-- git submodule update --init
-- Check out the tests
-
-~~~~
-pip install ./citePy11
-~~~~
-
-## Example Usage:
-
-### Create the binding
-
-You find the example in the sub folder citePyExample. To create the binding use:
-
-~~~~{.py}
-import citePy11
-
-
-header = citePy11.parse(['citePyExample/ExampleLib/AdditionalHeader.h', 'citePyExample/ExampleLib/IExample.h'])
-header.create_binding('citePyExample/citePyExample.cpp', 'citePyExample')
-~~~~
-
-### Use it:
-
-~~~~{.py}
-import citePyExample
-lib = citePyExample.IExample.createLibrary
-
-exampleStruct = citePyExample.ExampleStruct(5.0,3.0)
-
-print(lib.compute(citePyExample.ExampleEnum.subtract, exampleStruct))
-print(lib.add(1.1, 1.2))
-
->>> 2.0
->>> 2.3
-~~~~
-
-## Known Issues:
-
-- [Struct members with default initializer lists are unparsed](https://github.com/robotpy/robotpy-cppheaderparser/issues/63)
-    - CitePy tries to work around this issue by some specific line attribute replacements, like it's done in Additional Header example
-- enum class is not detected as enum. CitePy11 resolves this by replacing 'enum class' with 'enum' only during parsing
-- [Class Internal Typedefs are not parsed](https://github.com/robotpy/robotpy-cppheaderparser/issues/68)
+- Create the binding ([binding example](./create_example_binding.py))
+    - Create the config with the desired headers
+    - Add or ignore custom methods for python wrappers
+    - Create the binding (with optional python Mapper)
+- Compile the C++ library ([CMake example](citePyExample/CMakeLists.txt))
+- Use the pybind library [example](./test_compiled_library.py)
+- [Optional] Use the python mapper [example](./test_mapped_library.py)

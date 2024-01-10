@@ -15,7 +15,6 @@ setup(
     long_description=open('Readme.md').read(),
     install_requires=[
         "cxxheaderparser",
-        "pybind11",
         "pytest"
     ],
     license='LICENSE',
