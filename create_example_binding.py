@@ -5,6 +5,7 @@ config = citepy_config()
 
 # Define the header files that should be parsed
 config.header_files = ['citePyExample/ExampleLib/AdditionalHeader.h',
+                       'citePyExample/ExampleLib/AdditionalHeader2.h',
                        'citePyExample/ExampleLib/IExample.h',
                        'citePyExample/ExampleLib/MyInteger.h',]
 

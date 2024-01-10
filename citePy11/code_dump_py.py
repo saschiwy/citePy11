@@ -2,6 +2,55 @@ from citePy11.simpleDoxyParser import *
 from citePy11.code_dump_cpp import CodeDumpCpp
 
 
+class NameSpace:
+    def __init__(self):
+        self.name = ''
+        self.enums = []
+        self.classes = []
+        self.namespaces = {}
+        self.parent = None
+
+    def append_namespace(self, other):
+        self.enums += other.enums
+        self.classes += other.classes
+
+        for n in other.namespaces:
+            if n is None:
+                continue
+
+            if n in self.namespaces:
+                self.namespaces[n].append_namespace(other.namespaces[n])
+            else:
+                self.namespaces[n] = other.namespaces[n]
+
+
+def get_namespace(namespace, parent=''):
+    ns = NameSpace()
+
+    name = namespace.name
+    ns.name = name
+    ns.enums = namespace.enums
+    ns.classes = namespace.classes
+    ns.parent = parent
+
+    for n in namespace.namespaces:
+        if n is None:
+            continue
+
+        if len(parent) > 0:
+            parent_name = parent + '.' + name
+        else:
+            parent_name = name
+
+        new_ns = get_namespace(namespace.namespaces[n], parent_name)
+        if new_ns.name in ns.namespaces:
+            ns.namespaces[new_ns.name].append_namespace(new_ns)
+        else:
+            ns.namespaces[new_ns.name] = new_ns
+
+    return ns
+
+
 class CodeDumpPy:
     def __init__(self, code_dump_cpp: CodeDumpCpp, config):
         self.config = config
@@ -23,10 +72,23 @@ sys.path.append(script_path)
         result += f'\nimport __{module_name}__ as cpp_m\n\n'
         return result
 
-    def get_python_content(self, result, content):
+    def get_python_content(self, content):
         result = ''
+        # Multiple files can contain the same namespaces
+        # We need to collect all namespaces and combine them
+
+        namespaces = {}
+
         for c in content:
-            result += self.__get_python_namespace__(c.namespace, parent_namespace='')
+            ns = get_namespace(c.namespace)
+            if ns.name in namespaces:
+                namespaces[ns.name].append_namespace(ns)
+
+            else:
+                namespaces[ns.name] = ns
+
+        for ns in namespaces:
+            result += self.__get_python_namespace__(namespaces[ns], parent_namespace='')
         return result
 
     def __get_python_namespace__(self, content, parent_namespace=''):

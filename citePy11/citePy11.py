@@ -99,7 +99,7 @@ class CitePy11:
         dump_py = CodeDumpPy(self.dump_cpp, self.config)
 
         result = dump_py.get_python_head(module_name)
-        result += dump_py.get_python_content(result, self.contents)
+        result += dump_py.get_python_content(self.contents)
 
         return result
 
@@ -107,8 +107,4 @@ class CitePy11:
         # CPP Headerparser does not like preprocessor directives
         # so we remove them
         content = re.sub(r'#.*\n', '', content)
-
-        with open('preprocessed.h', 'w') as f:
-            f.write(content)
-
         return content

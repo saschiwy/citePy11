@@ -165,3 +165,10 @@ def test_greater_than_or_equal():
 
 def test_static_add():
     assert m.MyInteger.add(m.MyInteger(5), m.MyInteger(2)) == 7
+
+
+def test_second_external_struct():
+    second_struct = m.SecondNamespace.ExternalStruct2()
+    second_struct.testEnum = m.SecondNamespace.ExternalStruct.Test.b
+
+    assert second_struct.testEnum == m.SecondNamespace.ExternalStruct.Test.b

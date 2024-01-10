@@ -9,6 +9,102 @@ sys.path.append(script_path)
 
 import __citePyExample__ as cpp_m
 
+class MyInteger(cpp_m.MyInteger):
+    def __init__(self, *args):
+        if len(args) == 0:
+            super().__init__()
+
+        elif len(args) == 1:
+            super().__init__(args[0])
+
+        else:
+            raise Exception("No matching method found for __init__")
+
+    def __add__(self, *args):
+        if len(args) == 1:
+            return super().__add__(args[0])
+
+        else:
+            raise Exception("No matching method found for __add__")
+
+    def __sub__(self, *args):
+        if len(args) == 1:
+            return super().__sub__(args[0])
+
+        else:
+            raise Exception("No matching method found for __sub__")
+
+    def __mul__(self, *args):
+        if len(args) == 1:
+            return super().__mul__(args[0])
+
+        else:
+            raise Exception("No matching method found for __mul__")
+
+    def __truediv__(self, *args):
+        if len(args) == 1:
+            return super().__truediv__(args[0])
+
+        else:
+            raise Exception("No matching method found for __truediv__")
+
+    def __eq__(self, *args):
+        if len(args) == 1:
+            return super().__eq__(args[0])
+
+        else:
+            raise Exception("No matching method found for __eq__")
+
+    def __ne__(self, *args):
+        if len(args) == 1:
+            return super().__ne__(args[0])
+
+        else:
+            raise Exception("No matching method found for __ne__")
+
+    def __lt__(self, *args):
+        if len(args) == 1:
+            return super().__lt__(args[0])
+
+        else:
+            raise Exception("No matching method found for __lt__")
+
+    def __le__(self, *args):
+        if len(args) == 1:
+            return super().__le__(args[0])
+
+        else:
+            raise Exception("No matching method found for __le__")
+
+    def __gt__(self, *args):
+        if len(args) == 1:
+            return super().__gt__(args[0])
+
+        else:
+            raise Exception("No matching method found for __gt__")
+
+    def __ge__(self, *args):
+        if len(args) == 1:
+            return super().__ge__(args[0])
+
+        else:
+            raise Exception("No matching method found for __ge__")
+
+    def getValue(self, *args):
+        if len(args) == 0:
+            return super().getValue()
+
+        else:
+            raise Exception("No matching method found for getValue")
+
+    @staticmethod
+    def add(*args):
+        if len(args) == 2:
+            return cpp_m.MyInteger.add(args[0], args[1])
+
+        else:
+            raise Exception("No matching method found for add")
+
 class SecondNamespace:
     class ExternalStruct(cpp_m.SecondNamespace_ExternalStruct):
         class Test(cpp_m.SecondNamespace_ExternalStruct_Test):
@@ -38,6 +134,22 @@ class SecondNamespace:
         @listWithNumbersToAdd.setter
         def listWithNumbersToAdd(self, value):
             super(SecondNamespace.ExternalStruct, SecondNamespace.ExternalStruct).listWithNumbersToAdd.__set__(self, value)
+
+        def __init__(self, *args):
+            if len(args) == 0:
+                super().__init__()
+
+            else:
+                raise Exception("No matching method found for __init__")
+
+    class ExternalStruct2(cpp_m.SecondNamespace_ExternalStruct2):
+        @property
+        def testEnum(self):
+            return super(SecondNamespace.ExternalStruct2, SecondNamespace.ExternalStruct2).testEnum.__get__(self)
+
+        @testEnum.setter
+        def testEnum(self, value):
+            super(SecondNamespace.ExternalStruct2, SecondNamespace.ExternalStruct2).testEnum.__set__(self, value)
 
         def __init__(self, *args):
             if len(args) == 0:
@@ -226,100 +338,4 @@ class CitePyExampleNS:
 
         def __init__(self):
             self.__m__ = cpp_m.CitePyExampleNS_IExample.createLibrary()
-
-class MyInteger(cpp_m.MyInteger):
-    def __init__(self, *args):
-        if len(args) == 0:
-            super().__init__()
-
-        elif len(args) == 1:
-            super().__init__(args[0])
-
-        else:
-            raise Exception("No matching method found for __init__")
-
-    def __add__(self, *args):
-        if len(args) == 1:
-            return super().__add__(args[0])
-
-        else:
-            raise Exception("No matching method found for __add__")
-
-    def __sub__(self, *args):
-        if len(args) == 1:
-            return super().__sub__(args[0])
-
-        else:
-            raise Exception("No matching method found for __sub__")
-
-    def __mul__(self, *args):
-        if len(args) == 1:
-            return super().__mul__(args[0])
-
-        else:
-            raise Exception("No matching method found for __mul__")
-
-    def __truediv__(self, *args):
-        if len(args) == 1:
-            return super().__truediv__(args[0])
-
-        else:
-            raise Exception("No matching method found for __truediv__")
-
-    def __eq__(self, *args):
-        if len(args) == 1:
-            return super().__eq__(args[0])
-
-        else:
-            raise Exception("No matching method found for __eq__")
-
-    def __ne__(self, *args):
-        if len(args) == 1:
-            return super().__ne__(args[0])
-
-        else:
-            raise Exception("No matching method found for __ne__")
-
-    def __lt__(self, *args):
-        if len(args) == 1:
-            return super().__lt__(args[0])
-
-        else:
-            raise Exception("No matching method found for __lt__")
-
-    def __le__(self, *args):
-        if len(args) == 1:
-            return super().__le__(args[0])
-
-        else:
-            raise Exception("No matching method found for __le__")
-
-    def __gt__(self, *args):
-        if len(args) == 1:
-            return super().__gt__(args[0])
-
-        else:
-            raise Exception("No matching method found for __gt__")
-
-    def __ge__(self, *args):
-        if len(args) == 1:
-            return super().__ge__(args[0])
-
-        else:
-            raise Exception("No matching method found for __ge__")
-
-    def getValue(self, *args):
-        if len(args) == 0:
-            return super().getValue()
-
-        else:
-            raise Exception("No matching method found for getValue")
-
-    @staticmethod
-    def add(*args):
-        if len(args) == 2:
-            return cpp_m.MyInteger.add(args[0], args[1])
-
-        else:
-            raise Exception("No matching method found for add")
 

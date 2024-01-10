@@ -12,6 +12,7 @@
 #include <pybind11/stl.h>
 
 #include "AdditionalHeader.h"
+#include "AdditionalHeader2.h"
 #include "IExample.h"
 #include "MyInteger.h"
     
@@ -28,6 +29,10 @@ py::class_<SecondNamespace::ExternalStruct> (m, "SecondNamespace_ExternalStruct"
 .def_readwrite("testEnum", &SecondNamespace::ExternalStruct::testEnum)
 .def_readwrite("exampleDouble", &SecondNamespace::ExternalStruct::exampleDouble)
 .def_readwrite("listWithNumbersToAdd", &SecondNamespace::ExternalStruct::listWithNumbersToAdd)
+.def(py::init<>());
+
+py::class_<SecondNamespace::ExternalStruct2> (m, "SecondNamespace_ExternalStruct2")
+.def_readwrite("testEnum", &SecondNamespace::ExternalStruct2::testEnum)
 .def(py::init<>());
 
 py::enum_<CitePyExampleNS::ExampleEnum> (m, "CitePyExampleNS_ExampleEnum")
