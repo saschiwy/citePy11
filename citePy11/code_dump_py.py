@@ -35,13 +35,16 @@ sys.path.append(script_path)
         if len(parent_namespace) > 0:
             full_namespace = f'{parent_namespace}.{namespace_name}'
             namespace_nesting = len(full_namespace.split('.')) * '    '
+            indent = '    '
 
         elif len(namespace_name) > 0:
             full_namespace = namespace_name
             namespace_nesting = ''
+            indent = '    '
         else:
             full_namespace = ''
             namespace_nesting = ''
+            indent = ''
 
         result = ''
         if len(namespace_name) > 0:
@@ -51,11 +54,11 @@ sys.path.append(script_path)
 
         for e in content.enums:
             enum_lines = self.__create_enum__(e, full_pybind_name)
-            result += self.__indent__(enum_lines, indent='    ', max_empty_lines=1)
+            result += self.__indent__(enum_lines, indent=indent, max_empty_lines=1)
 
         for c in content.classes:
             class_lines = self.__create_class__(c, full_pybind_name, full_namespace)
-            result += self.__indent__(class_lines, indent='    ', max_empty_lines=1)
+            result += self.__indent__(class_lines, indent=indent, max_empty_lines=1)
 
         for namespace in content.namespaces:
             t = content.namespaces[namespace]
@@ -78,7 +81,11 @@ sys.path.append(script_path)
 
     def __create_class__(self, c, full_pybind_name, python_namespace):
         class_name = c.class_decl.typename.segments[0].name
-        full_pybind_name += f'_{class_name}'
+
+        if len(full_pybind_name) > 0 and full_pybind_name[-1] != '.':
+            full_pybind_name += '_'
+
+        full_pybind_name += f'{class_name}'
         full_python_name = f'{python_namespace}.{class_name}'
 
         is_virtual = self.__is_virtual__(c)
@@ -113,9 +120,6 @@ sys.path.append(script_path)
         methods = self.__get_class_methods__(c, full_python_name, is_virtual)
         result += self.__indent__(methods, indent='    ', max_empty_lines=1)
 
-        methods = self.__get_static_methods__(c, full_python_name, class_name)
-        result += self.__indent__(methods, indent='    ', max_empty_lines=1)
-
         return result
 
     def __create_field__(self, f, full_pybind_name):
@@ -145,6 +149,10 @@ sys.path.append(script_path)
         # Collect all methods and overloaded methods with the number of parameters and doxygen
         method_dict = {}
         has_constructor = False
+        if namespace.startswith('.'):
+            namespace = namespace[1:]
+
+        result = ''
 
         for m in methods.methods:
             if m.access != 'public':
@@ -153,10 +161,27 @@ sys.path.append(script_path)
             if m.destructor:
                 continue
 
-            if m.static:
-                continue
-
             name = m.name.segments[0].name
+
+            if m.operator is not None:
+                op = self.__valid_operator__(m)
+                if len(op) > 0:
+                    name = op
+                else:
+                    continue
+
+            if m.static:
+                decorator = '@staticmethod\n'
+            else:
+                decorator = ''
+
+            if m.static:
+                call_prefix = f'cpp_m.{namespace.replace(".", "_")}'
+            elif is_virtual:
+                call_prefix = 'self.__m__'
+            else:
+                call_prefix = 'super()'
+
             cpp_namespace = namespace.replace(".", "::")
             if f'{cpp_namespace}::{name}' in self.config.methods_to_ignore:
                 continue
@@ -168,113 +193,61 @@ sys.path.append(script_path)
             if name not in method_dict:
                 method_dict[name] = []
 
-            method_dict[name].append((len(m.parameters), m.doxygen, m.return_type))
+            method_dict[name].append(
+                {'params': len(m.parameters),
+                 'doc': m.doxygen,
+                 'return': m.return_type,
+                 'decorator': decorator,
+                 'call_prefix': call_prefix})
 
         if not has_constructor and not is_virtual:
-            method_dict['__init__'] = [(0, None, None)]
-
-        result = ''
+            method_dict['__init__'] = [{'params': 0,
+                                        'doc': None,
+                                        'return': None,
+                                        'decorator': '',
+                                        'call_prefix': 'super()'}]
 
         for m in method_dict:
             tag = 'if'
             handled_number_of_params = []
-            result += f'def {m}(self, *args):\n'
+            d = method_dict[m][0]
+            decorator = d['decorator']
+            self_tag = ''
+            if decorator == '':
+                self_tag = 'self, '
+
+            result += f'{decorator}def {m}({self_tag}*args):\n'
 
             docs = []
             for p in method_dict[m]:
-                if p[1] is not None:
-                    docs.append(parse_doxygen_comment(p[1]))
+                if p['doc'] is not None:
+                    docs.append(parse_doxygen_comment(p['doc']))
             doc_content = create_method_docstring(docs)
             if len(doc_content) > 0:
                 result += self.__indent__(doc_content, indent='    ', max_empty_lines=1)
 
             for p in method_dict[m]:
-                if p[0] in handled_number_of_params:
+                params = p['params']
+                if params in handled_number_of_params:
                     continue
 
-                result += f'    {tag} len(args) == {p[0]}:\n'
-                if p[2] is None:
+                result += f'    {tag} len(args) == {params}:\n'
+                if p['return'] is None:
                     ret_type = ''
                 else:
                     ret_type = 'return '
 
-                if is_virtual:
-                    result += f'        {ret_type}self.__m__.{m}('
-                else:
-                    result += f'        {ret_type}super().{m}('
+                call_prefix = p['call_prefix']
+                result += f'        {ret_type}{call_prefix}.{m}('
 
-                if p[0] > 0:
-                    for i in range(p[0]):
+                if params > 0:
+                    for i in range(params):
                         result += f'args[{i}], '
                     result = result[:-2]
                 result += ')\n\n'
                 tag = 'elif'
 
-                handled_number_of_params.append(p[0])
-
-            result += f'    else:\n'
-            result += f'        raise Exception("No matching method found for {m}")\n\n'
-
-        return result
-
-    def __get_static_methods__(self, methods, namespace, class_name):
-        # Collect all methods and overloaded methods with the number of parameters and doxygen
-        method_dict = {}
-
-        for m in methods.methods:
-            if m.access != 'public':
-                continue
-
-            if not m.static:
-                continue
-
-            name = m.name.segments[0].name
-            cpp_namespace = namespace.replace(".", "::")
-            if f'{cpp_namespace}::{name}' in self.config.methods_to_ignore:
-                continue
-
-            if name not in method_dict:
-                method_dict[name] = []
-
-            method_dict[name].append((len(m.parameters), m.doxygen, m.return_type))
-
-        result = ''
-        for m in method_dict:
-            tag = 'if'
-            handled_number_of_params = []
-            result += f'@staticmethod\ndef {m}(*args):\n'
-            doc_content = '"""\n'
-
-            for p in method_dict[m]:
-                if p[0] in handled_number_of_params:
-                    continue
-                doc_content += create_method_docstring(parse_doxygen_comment(p[1]), skip_start_and_end=True)
-                doc_content += 80 * '-' + '\n'
-
-            doc_content += '"""\n'
-            result += self.__indent__(doc_content, indent='    ', max_empty_lines=1)
-
-            for p in method_dict[m]:
-                if p[0] in handled_number_of_params:
-                    continue
-
-                result += f'    {tag} len(args) == {p[0]}:\n'
-                if p[2] is None:
-                    ret_type = ''
-                else:
-                    ret_type = 'return '
-
-                full_pybind_name = f'{namespace.replace(".", "_")}'
-                result += f'        {ret_type}cpp_m.{full_pybind_name}.{m}('
-
-                if p[0] > 0:
-                    for i in range(p[0]):
-                        result += f'args[{i}], '
-                    result = result[:-2]
-                result += ')\n\n'
-                tag = 'elif'
-
-                handled_number_of_params.append(p[0])
+                handled_number_of_params.append(params)
 
             result += f'    else:\n'
             result += f'        raise Exception("No matching method found for {m}")\n\n'
@@ -309,3 +282,15 @@ sys.path.append(script_path)
             result += f'{indent}{li}\n'
 
         return result
+
+    def __valid_operator__(self, m):
+        if m.operator is None:
+            return ''
+
+        if m.operator not in self.config.operator_map:
+            return ''
+
+        if len(m.parameters) != 1:
+            return ''
+
+        return self.config.operator_map[m.operator]

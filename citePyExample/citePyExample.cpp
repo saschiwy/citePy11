@@ -13,6 +13,7 @@
 
 #include "AdditionalHeader.h"
 #include "IExample.h"
+#include "MyInteger.h"
     
 
 namespace py = pybind11;
@@ -51,6 +52,33 @@ py::class_<CitePyExampleNS::IExample> (m, "CitePyExampleNS_IExample")
 .def("compute", py::overload_cast<SecondNamespace::ExternalStruct>(&CitePyExampleNS::IExample::compute))
 .def("registerCallback", py::overload_cast<CitePyExampleNS::ExampleCallbackDefinition>(&CitePyExampleNS::IExample::registerCallback))
 .def("addReferenced", [](CitePyExampleNS::IExample& self, double& result, double left, double right) {auto __result = result; self.addReferenced(__result, left, right); return __result;})
+;
+
+py::class_<MyInteger> (m, "MyInteger")
+.def(py::init<>())
+.def(py::init<int>())
+.def("__add__", py::overload_cast<const MyInteger&>(&MyInteger::operator+, py::const_))
+.def("__sub__", py::overload_cast<const MyInteger&>(&MyInteger::operator-, py::const_))
+.def("__mul__", py::overload_cast<const MyInteger&>(&MyInteger::operator*, py::const_))
+.def("__truediv__", py::overload_cast<const MyInteger&>(&MyInteger::operator/, py::const_))
+.def("__eq__", py::overload_cast<const MyInteger&>(&MyInteger::operator==, py::const_))
+.def("__ne__", py::overload_cast<const MyInteger&>(&MyInteger::operator!=, py::const_))
+.def("__lt__", py::overload_cast<const MyInteger&>(&MyInteger::operator<, py::const_))
+.def("__le__", py::overload_cast<const MyInteger&>(&MyInteger::operator<=, py::const_))
+.def("__gt__", py::overload_cast<const MyInteger&>(&MyInteger::operator>, py::const_))
+.def("__ge__", py::overload_cast<const MyInteger&>(&MyInteger::operator>=, py::const_))
+.def("__add__", py::overload_cast<const int&>(&MyInteger::operator+, py::const_))
+.def("__sub__", py::overload_cast<const int&>(&MyInteger::operator-, py::const_))
+.def("__mul__", py::overload_cast<const int&>(&MyInteger::operator*, py::const_))
+.def("__truediv__", py::overload_cast<const int&>(&MyInteger::operator/, py::const_))
+.def("__eq__", py::overload_cast<const int&>(&MyInteger::operator==, py::const_))
+.def("__ne__", py::overload_cast<const int&>(&MyInteger::operator!=, py::const_))
+.def("__lt__", py::overload_cast<const int&>(&MyInteger::operator<, py::const_))
+.def("__le__", py::overload_cast<const int&>(&MyInteger::operator<=, py::const_))
+.def("__gt__", py::overload_cast<const int&>(&MyInteger::operator>, py::const_))
+.def("__ge__", py::overload_cast<const int&>(&MyInteger::operator>=, py::const_))
+.def("getValue", py::overload_cast<>(&MyInteger::getValue, py::const_))
+.def_static("add", py::overload_cast<MyInteger, MyInteger>(&MyInteger::add))
 ;
 
 }

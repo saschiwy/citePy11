@@ -7,7 +7,8 @@ namespace SecondNamespace
 {
     struct ExternalStruct
     {
-        enum class Test{
+        enum class Test
+        {
             a,
             b
         };
@@ -18,4 +19,3 @@ namespace SecondNamespace
         std::vector<double> listWithNumbersToAdd{};
     };
 }
-

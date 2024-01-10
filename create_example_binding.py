@@ -1,11 +1,12 @@
-from citePy11 import CitePy11
+from citePy11.citePy11 import CitePy11
 from citePy11.citepy_config import citepy_config
 
 config = citepy_config()
 
 # Define the header files that should be parsed
 config.header_files = ['citePyExample/ExampleLib/AdditionalHeader.h',
-                       'citePyExample/ExampleLib/IExample.h']
+                       'citePyExample/ExampleLib/IExample.h',
+                       'citePyExample/ExampleLib/MyInteger.h',]
 
 # [OPTIONAL] Create methods which should be ignored in C++ syntax with full namespace
 config.methods_to_ignore = ['CitePyExampleNS::IExample::createLibrary']

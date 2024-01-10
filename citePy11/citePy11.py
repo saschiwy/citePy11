@@ -46,8 +46,12 @@ class CitePy11:
             self.filenames.append(filename)
 
             with open(header, 'r') as f:
-                #     content = self.__fix_content__(f.read())
-                self.contents.append(parse_string(f.read(), filename=filename))
+                content = self.__preprocess__(f.read())
+                self.contents.append(parse_string(content))
+
+        for header_content in self.config.header_contents:
+            content = self.__preprocess__(header_content)
+            self.contents.append(parse_string(content))
 
     def create_cpp(self, module_name):
         """
@@ -57,12 +61,13 @@ class CitePy11:
         result = self.dump_cpp.get_cpp_head(self.filenames)
         result = self.dump_cpp.add_module(result, module_name)
 
-        for i in range(len(self.filenames)):
-            result += self.__create_cpp__(self.contents[i], self.filenames[i])
+        for content in self.contents:
+            result += self.__create_cpp__(content)
+
         result = self.dump_cpp.close_module(result)
         return result
 
-    def __create_cpp__(self, content, header_file):
+    def __create_cpp__(self, content):
         """
         Create the cpp content, of one file
         """
@@ -97,3 +102,13 @@ class CitePy11:
         result += dump_py.get_python_content(result, self.contents)
 
         return result
+
+    def __preprocess__(self, content):
+        # CPP Headerparser does not like preprocessor directives
+        # so we remove them
+        content = re.sub(r'#.*\n', '', content)
+
+        with open('preprocessed.h', 'w') as f:
+            f.write(content)
+
+        return content

@@ -168,14 +168,21 @@ namespace py = pybind11;
             if method.template:
                 continue
 
+            if method.operator is not None:
+                if method.operator not in self.config.operator_map:
+                    continue
+                python_name = self.config.operator_map[method.operator]
+            else:
+                python_name = name
+
             begin = '.def'
             if method.static:
                 begin += '_static'
 
             if len(self.__get_ref_params__(method.parameters)) > 0:
-                content = self.__add_reference_method__(content, method, name, begin, namespace_prefix[:-2])
+                content = self.__add_reference_method__(content, method, name, python_name, begin, namespace_prefix[:-2])
             else:
-                content = self.__add_value_method__(content, method, name, namespace_prefix, begin)
+                content = self.__add_value_method__(content, method, name, python_name, namespace_prefix, begin)
 
         if not has_constructor and not is_virtual:
             content += '.def(py::init<>())'
@@ -238,8 +245,8 @@ namespace py = pybind11;
         result += '>'
         return result
 
-    def __add_value_method__(self, content, method, name, namespace_prefix, begin):
-        content += begin + '("' + name + '", py::overload_cast<'
+    def __add_value_method__(self, content, method, name, python_name, namespace_prefix, begin):
+        content += begin + '("' + python_name + '", py::overload_cast<'
         content += self.__add_parameters__(method.parameters, types_only=True)
         content += '>(&' + namespace_prefix + name
 
@@ -256,8 +263,8 @@ namespace py = pybind11;
                 ref_params.append(arg)
         return ref_params
 
-    def __add_reference_method__(self, content, method, name, begin, class_name):
-        content += begin + '("' + name + '", [](' + class_name + '& self'
+    def __add_reference_method__(self, content, method, name, python_name, begin, class_name):
+        content += begin + '("' + python_name + '", [](' + class_name + '& self'
         content += ', ' + self.__add_parameters__(method.parameters, types_only=False) + ') {'
 
         ref_params = self.__get_ref_params__(method.parameters)

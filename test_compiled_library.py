@@ -96,3 +96,72 @@ def test_callback():
 
     for received, expected in zip(received_callback_values, expected_values):
         assert abs(received - expected) <= tolerance
+
+
+def test_addition():
+    my_integer = cpp_m.MyInteger(5)
+    result = my_integer + 3 == 8
+
+    assert result
+
+
+def test_subtraction():
+    my_integer = cpp_m.MyInteger(5)
+
+    result = my_integer - 2
+    assert result == 3
+
+
+def test_multiplication():
+    my_integer = cpp_m.MyInteger()
+    my_integer += 5
+
+    result = my_integer * 2
+    assert result == 10
+
+
+def test_division():
+    my_integer = cpp_m.MyInteger(5)
+
+    result = my_integer / cpp_m.MyInteger(2)
+    assert result == 2
+
+
+def test_equality():
+    my_integer = cpp_m.MyInteger(5)
+
+    assert my_integer == 5
+
+
+def test_inequality():
+    my_integer = cpp_m.MyInteger(5)
+
+    assert my_integer != 4
+
+
+def test_less_than():
+    my_integer = cpp_m.MyInteger(5)
+
+    assert my_integer < 10
+
+
+def test_less_than_or_equal():
+    my_integer = cpp_m.MyInteger(5)
+
+    assert my_integer <= 5
+
+
+def test_greater_than():
+    my_integer = cpp_m.MyInteger(5)
+
+    assert my_integer > 2
+
+
+def test_greater_than_or_equal():
+    my_integer = cpp_m.MyInteger(5)
+
+    assert my_integer >= 5
+
+
+def test_static_add():
+    assert cpp_m.MyInteger.add(cpp_m.MyInteger(5), cpp_m.MyInteger(2)) == 7
