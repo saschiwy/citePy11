@@ -51,19 +51,16 @@ sys.path.append(script_path)
 
         for e in content.enums:
             enum_lines = self.__create_enum__(e, full_pybind_name)
-            for li in enum_lines.split('\n'):
-                result += f'    {li}\n'
+            result += self.__indent__(enum_lines, indent='    ', max_empty_lines=1)
 
         for c in content.classes:
             class_lines = self.__create_class__(c, full_pybind_name, full_namespace)
-            for li in class_lines.split('\n'):
-                result += f'    {li}\n'
+            result += self.__indent__(class_lines, indent='    ', max_empty_lines=1)
 
         for namespace in content.namespaces:
             t = content.namespaces[namespace]
             namespace_lines = self.__get_python_namespace__(t, full_namespace)
-            for li in namespace_lines.split('\n'):
-                result += f'{namespace_nesting}{li}\n'
+            result += self.__indent__(namespace_lines, indent=namespace_nesting, max_empty_lines=1)
 
         return result
 
@@ -71,7 +68,7 @@ sys.path.append(script_path)
         enum_name = enum.typename.segments[0].name
         full_pybind_name += f'_{enum_name}'
 
-        result = f'class {enum_name}(enum.Enum):\n{self.__get_class_docstring__(enum.doxygen)}'
+        result = f'class {enum_name}({full_pybind_name}):\n{self.__get_class_docstring__(enum.doxygen)}'
 
         for enum_value in enum.values:
             val_name = enum_value.name
@@ -84,41 +81,40 @@ sys.path.append(script_path)
         full_pybind_name += f'_{class_name}'
         full_python_name = f'{python_namespace}.{class_name}'
 
-        result = f'class {class_name}({full_pybind_name}):\n'
+        is_virtual = self.__is_virtual__(c)
+
+        if is_virtual:
+            result = f'class {class_name}:\n'
+        else:
+            result = f'class {class_name}({full_pybind_name}):\n'
 
         if c.class_decl.doxygen is not None:
             doc = create_method_docstring(parse_doxygen_comment(c.class_decl.doxygen))
-            for li in doc.split('\n'):
-                result += f'    {li}\n'
+            result += self.__indent__(doc, indent='    ', max_empty_lines=1)
 
         for e in c.enums:
             enum_lines = self.__create_enum__(e, full_pybind_name)
-            for li in enum_lines.split('\n'):
-                result += f'    {li}\n'
+            result += self.__indent__(enum_lines, indent='    ', max_empty_lines=1)
 
         for f in c.fields:
             if f.access != 'public':
                 continue
 
             field_lines = self.__create_field__(f, full_python_name)
-            for li in field_lines.split('\n'):
-                result += f'    {li}\n'
+            result += self.__indent__(field_lines, indent='    ', max_empty_lines=1)
 
         for c in c.classes:
             if c.access != 'public':
                 continue
 
             class_lines = self.__create_class__(c, full_pybind_name, full_python_name)
-            for li in class_lines.split('\n'):
-                result += f'    {li}\n'
+            result += self.__indent__(class_lines, indent='    ', max_empty_lines=1)
 
-        methods = self.__get_class_methods__(c, full_python_name)
-        for li in methods.split('\n'):
-            result += f'    {li}\n'
+        methods = self.__get_class_methods__(c, full_python_name, is_virtual)
+        result += self.__indent__(methods, indent='    ', max_empty_lines=1)
 
         methods = self.__get_static_methods__(c, full_python_name, class_name)
-        for li in methods.split('\n'):
-            result += f'    {li}\n'
+        result += self.__indent__(methods, indent='    ', max_empty_lines=1)
 
         return result
 
@@ -130,8 +126,7 @@ sys.path.append(script_path)
 
         if f.doxygen is not None:
             doc = create_field_docstring(f.doxygen)
-            for li in doc.split('\n'):
-                result += f'    {li}\n'
+            result += self.__indent__(doc, indent='    ', max_empty_lines=1)
 
         result += f'    return super({full_pybind_name}, {full_pybind_name}).{field_name}.__get__(self)\n\n'
         result += f'@{field_name}.setter\n'
@@ -144,12 +139,9 @@ sys.path.append(script_path)
         if doxygen is None:
             return ''
         doc = create_method_docstring(parse_doxygen_comment(doxygen))
-        result = ''
-        for li in doc.split('\n'):
-            result += f'    {li}\n'
-        return result
+        return self.__indent__(doc, indent='    ', max_empty_lines=1)
 
-    def __get_class_methods__(self, methods, namespace):
+    def __get_class_methods__(self, methods, namespace, is_virtual):
         # Collect all methods and overloaded methods with the number of parameters and doxygen
         method_dict = {}
         has_constructor = False
@@ -178,14 +170,23 @@ sys.path.append(script_path)
 
             method_dict[name].append((len(m.parameters), m.doxygen, m.return_type))
 
-        if not has_constructor:
+        if not has_constructor and not is_virtual:
             method_dict['__init__'] = [(0, None, None)]
 
         result = ''
+
         for m in method_dict:
             tag = 'if'
             handled_number_of_params = []
             result += f'def {m}(self, *args):\n'
+
+            docs = []
+            for p in method_dict[m]:
+                if p[1] is not None:
+                    docs.append(parse_doxygen_comment(p[1]))
+            doc_content = create_method_docstring(docs)
+            if len(doc_content) > 0:
+                result += self.__indent__(doc_content, indent='    ', max_empty_lines=1)
 
             for p in method_dict[m]:
                 if p[0] in handled_number_of_params:
@@ -197,7 +198,10 @@ sys.path.append(script_path)
                 else:
                     ret_type = 'return '
 
-                result += f'        {ret_type}super().{m}('
+                if is_virtual:
+                    result += f'        {ret_type}self.__m__.{m}('
+                else:
+                    result += f'        {ret_type}super().{m}('
 
                 if p[0] > 0:
                     for i in range(p[0]):
@@ -239,6 +243,16 @@ sys.path.append(script_path)
             tag = 'if'
             handled_number_of_params = []
             result += f'@staticmethod\ndef {m}(*args):\n'
+            doc_content = '"""\n'
+
+            for p in method_dict[m]:
+                if p[0] in handled_number_of_params:
+                    continue
+                doc_content += create_method_docstring(parse_doxygen_comment(p[1]), skip_start_and_end=True)
+                doc_content += 80 * '-' + '\n'
+
+            doc_content += '"""\n'
+            result += self.__indent__(doc_content, indent='    ', max_empty_lines=1)
 
             for p in method_dict[m]:
                 if p[0] in handled_number_of_params:
@@ -264,5 +278,34 @@ sys.path.append(script_path)
 
             result += f'    else:\n'
             result += f'        raise Exception("No matching method found for {m}")\n\n'
+
+        if namespace in self.config.custom_methods:
+            for m in self.config.custom_methods[namespace]:
+                result += self.__indent__(m, '', 1)
+
+        return result
+
+    def __is_virtual__(self, c):
+        for m in c.methods:
+            if m.pure_virtual:
+                return True
+        return False
+
+    @staticmethod
+    def __indent__(lines, indent, max_empty_lines):
+        result = ''
+        empty_line_count = 0
+        for li in lines.replace("\t", "    ").split('\n'):
+            if li.strip() == '':
+                empty_line_count += 1
+
+                if empty_line_count > max_empty_lines:
+                    continue
+
+                result += '\n'
+                continue
+
+            empty_line_count = 0
+            result += f'{indent}{li}\n'
 
         return result

@@ -114,7 +114,7 @@ namespace CitePyExampleNS
         /*!
          * \fn  virtual double IExample::compute(ExampleEnum option, ExampleStruct values) = 0;
          *
-         * \brief   Computes
+         * \brief   Computes with an enum operator and the values inside the example structure
          *
          * \param   option  The option.
          * \param   values  The values.
@@ -126,7 +126,7 @@ namespace CitePyExampleNS
         /*!
          * \fn  virtual double IExample::compute(SecondNamespace::ExternalStruct values) = 0;
          *
-         * \brief   Ass all the given values, inside the vector
+         * \brief   Adds all the given values, inside the vector
          *
          * \param   values  The values.
          *

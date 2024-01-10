@@ -265,30 +265,39 @@ namespace py = pybind11;
         for arg in ref_params:
             content += 'auto __' + arg.name + ' = ' + arg.name + '; '
 
+        number_of_return_values = len(ref_params)
+
         type_name = self.__get_type__(method.return_type.typename.segments)
         if type_name != 'void':
             content += 'const auto __returnCode = '
+            number_of_return_values += 1
 
         content += 'self.' + name + '('
 
         param_names = self.__get_param_names__(method.parameters)
         for i, arg in enumerate(param_names):
-            if arg in ref_params:
+            if self.__is_in_params__(arg, ref_params):
                 content += '__'
             content += arg
             if i < len(param_names) - 1:
                 content += ', '
 
-        content += '); return std::make_tuple('
-        if type_name != 'void':
-            content += '__returnCode, '
+        if number_of_return_values > 1:
+            content += '); return std::make_tuple('
+            if type_name != 'void':
+                content += '__returnCode, '
 
-        for i, arg in enumerate(ref_params):
-            content += '__' + arg.name
-            if i < len(ref_params) - 1:
-                content += ', '
+            for i, arg in enumerate(ref_params):
+                content += '__' + arg.name
+                if i < len(ref_params) - 1:
+                    content += ', '
 
-        content += '); }' + self.__add_description__(method.doxygen) + ')\n'
+            content += ');'
+
+        else:
+            content += f'); return __{ref_params[0].name};'
+
+        content += '}' + self.__add_description__(method.doxygen) + ')\n'
         return content
 
     def __get_param_names__(self, parameters):
@@ -308,3 +317,9 @@ namespace py = pybind11;
             return self.full_names[name].replace('::', '_')
         else:
             return name
+
+    def __is_in_params__(self, arg, ref_params):
+        for ref in ref_params:
+            if ref.name == arg:
+                return True
+        return False

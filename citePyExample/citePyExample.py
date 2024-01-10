@@ -11,163 +11,219 @@ import __citePyExample__ as cpp_m
 
 class SecondNamespace:
     class ExternalStruct(cpp_m.SecondNamespace_ExternalStruct):
-        class Test(enum.Enum):
+        class Test(cpp_m.SecondNamespace_ExternalStruct_Test):
             a = cpp_m.SecondNamespace_ExternalStruct_Test.a
             b = cpp_m.SecondNamespace_ExternalStruct_Test.b
-        
+
         @property
         def testEnum(self):
             return super(SecondNamespace.ExternalStruct, SecondNamespace.ExternalStruct).testEnum.__get__(self)
-        
+
         @testEnum.setter
         def testEnum(self, value):
             super(SecondNamespace.ExternalStruct, SecondNamespace.ExternalStruct).testEnum.__set__(self, value)
-        
+
         @property
         def exampleDouble(self):
             return super(SecondNamespace.ExternalStruct, SecondNamespace.ExternalStruct).exampleDouble.__get__(self)
-        
+
         @exampleDouble.setter
         def exampleDouble(self, value):
             super(SecondNamespace.ExternalStruct, SecondNamespace.ExternalStruct).exampleDouble.__set__(self, value)
-        
+
         @property
         def listWithNumbersToAdd(self):
             return super(SecondNamespace.ExternalStruct, SecondNamespace.ExternalStruct).listWithNumbersToAdd.__get__(self)
-        
+
         @listWithNumbersToAdd.setter
         def listWithNumbersToAdd(self, value):
             super(SecondNamespace.ExternalStruct, SecondNamespace.ExternalStruct).listWithNumbersToAdd.__set__(self, value)
-        
+
         def __init__(self, *args):
             if len(args) == 0:
                 super().__init__()
-        
+
             else:
                 raise Exception("No matching method found for __init__")
-        
-        
-        
-    
 
 class CitePyExampleNS:
-    class ExampleEnum(enum.Enum):
+    class ExampleEnum(cpp_m.CitePyExampleNS_ExampleEnum):
         """
-        Values that represent example enums
+          - Values that represent example enums
         """
-        
+
         add = cpp_m.CitePyExampleNS_ExampleEnum.add
         subtract = cpp_m.CitePyExampleNS_ExampleEnum.subtract
-    
+
     class ExampleStruct(cpp_m.CitePyExampleNS_ExampleStruct):
         """
-        An example structure.
+          - An example structure.
         """
-        
+
         @property
         def left(self):
             """The left"""
             return super(CitePyExampleNS.ExampleStruct, CitePyExampleNS.ExampleStruct).left.__get__(self)
-        
+
         @left.setter
         def left(self, value):
             super(CitePyExampleNS.ExampleStruct, CitePyExampleNS.ExampleStruct).left.__set__(self, value)
-        
+
         @property
         def right(self):
             """The right"""
             return super(CitePyExampleNS.ExampleStruct, CitePyExampleNS.ExampleStruct).right.__get__(self)
-        
+
         @right.setter
         def right(self, value):
             super(CitePyExampleNS.ExampleStruct, CitePyExampleNS.ExampleStruct).right.__set__(self, value)
-        
+
         def __init__(self, *args):
+            """
+              - Default constructor
+              - Constructor
+            Parameter:
+              - Variant 0:
+              - Variant 1:
+                -- left    The left.
+                -- right   The right.
+            Function:
+              - ExampleStruct();
+              - ExampleStruct(double left, double right);
+            """
+
             if len(args) == 0:
                 super().__init__()
-        
+
             elif len(args) == 2:
                 super().__init__(args[0], args[1])
-        
+
             else:
                 raise Exception("No matching method found for __init__")
-        
+
         def set(self, *args):
             if len(args) == 2:
                 return super().set(args[0], args[1])
-        
+
             else:
                 raise Exception("No matching method found for set")
-        
+
         def getLeft(self, *args):
             if len(args) == 0:
                 return super().getLeft()
-        
+
             else:
                 raise Exception("No matching method found for getLeft")
-        
-        
-        
-    
-    class IExample(cpp_m.CitePyExampleNS_IExample):
+
+    class IExample:
         """
-        An example class to show the usage ot citePy
+          - An example class to show the usage ot citePy
         """
-        
+
         def add(self, *args):
+            """
+              - Adds two doubles
+            Parameter:
+              - Variant 0:
+                -- left    The left.
+                -- right   The right.
+            Returns:
+              - the result.
+            Function:
+              - virtual double IExample::add(double left, double right) = 0;
+            """
+
             if len(args) == 2:
-                return super().add(args[0], args[1])
-        
+                return self.__m__.add(args[0], args[1])
+
             else:
                 raise Exception("No matching method found for add")
-        
+
         def subtract(self, *args):
+            """
+              - Subtracts two doubles
+            Parameter:
+              - Variant 0:
+                -- left    The left.
+                -- right   The right.
+            Returns:
+              - the result.
+            Function:
+              - virtual double IExample::subtract(double left, double right) = 0;
+            """
+
             if len(args) == 2:
-                return super().subtract(args[0], args[1])
-        
+                return self.__m__.subtract(args[0], args[1])
+
             else:
                 raise Exception("No matching method found for subtract")
-        
+
         def compute(self, *args):
+            """
+              - Computes with an enum operator and the values inside the example structure
+              - Adds all the given values, inside the vector
+              - Computes the given values
+            Parameter:
+              - Variant 0:
+                -- option  The option.
+                -- values  The values.
+              - Variant 1:
+                -- values  The values.
+              - Variant 2:
+                -- values  The values.
+            Returns:
+              - the result.
+              - A double.
+              - A double.
+            Function:
+              - virtual double IExample::compute(ExampleEnum option, ExampleStruct values) = 0;
+              - virtual double IExample::compute(SecondNamespace::ExternalStruct values) = 0;
+              - virtual double IExample::compute(SecondNamespace::ExternalStruct values) = 0;
+            """
+
             if len(args) == 2:
-                return super().compute(args[0], args[1])
-        
+                return self.__m__.compute(args[0], args[1])
+
             elif len(args) == 1:
-                return super().compute(args[0])
-        
+                return self.__m__.compute(args[0])
+
             else:
                 raise Exception("No matching method found for compute")
-        
+
         def registerCallback(self, *args):
+            """
+              - Registers the callback described by cb
+            Parameter:
+              - Variant 0:
+                -- cb  The cb.
+            Function:
+              - virtual void IExample::registerCallback(ExampleCallbackDefinition cb) = 0;
+            """
+
             if len(args) == 1:
-                return super().registerCallback(args[0])
-        
+                return self.__m__.registerCallback(args[0])
+
             else:
                 raise Exception("No matching method found for registerCallback")
-        
+
         def addReferenced(self, *args):
+            """
+              - Adds a referenced
+            Parameter:
+              - Variant 0:
+                -- [in,out]  result  The result.
+                -- left    The left.
+                -- right   The right.
+            Function:
+              - virtual void IExample::addReferenced(double& result, double left, double right) = 0;
+            """
+
             if len(args) == 3:
-                return super().addReferenced(args[0], args[1], args[2])
-        
+                return self.__m__.addReferenced(args[0], args[1], args[2])
+
             else:
                 raise Exception("No matching method found for addReferenced")
-        
-        def __init__(self, *args):
-            if len(args) == 0:
-                super().__init__()
-        
-            else:
-                raise Exception("No matching method found for __init__")
-        
-        
-        @staticmethod
-        def createLibrary(*args):
-            if len(args) == 0:
-                return cpp_m.CitePyExampleNS_IExample.createLibrary()
-        
-            else:
-                raise Exception("No matching method found for createLibrary")
-        
-        
-    
+
+        def __init__(self):
+            self.__m__ = cpp_m.CitePyExampleNS_IExample.createLibrary()
 

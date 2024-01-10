@@ -16,6 +16,7 @@ setup(
     install_requires=[
         "cxxheaderparser",
         "pybind11",
+        "pytest"
     ],
     license='LICENSE',
     packages=['citePy11'],

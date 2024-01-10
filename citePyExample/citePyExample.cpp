@@ -50,7 +50,7 @@ py::class_<CitePyExampleNS::IExample> (m, "CitePyExampleNS_IExample")
 .def("compute", py::overload_cast<const std::vector<double>&>(&CitePyExampleNS::IExample::compute))
 .def("compute", py::overload_cast<SecondNamespace::ExternalStruct>(&CitePyExampleNS::IExample::compute))
 .def("registerCallback", py::overload_cast<CitePyExampleNS::ExampleCallbackDefinition>(&CitePyExampleNS::IExample::registerCallback))
-.def("addReferenced", [](CitePyExampleNS::IExample& self, double& result, double left, double right) {auto __result = result; self.addReferenced(result, left, right); return std::make_tuple(__result); })
+.def("addReferenced", [](CitePyExampleNS::IExample& self, double& result, double left, double right) {auto __result = result; self.addReferenced(__result, left, right); return __result;})
 ;
 
 }

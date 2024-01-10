@@ -5,9 +5,9 @@ config = citepy_config()
 config.header_files = ['citePyExample/ExampleLib/AdditionalHeader.h',
                        'citePyExample/ExampleLib/IExample.h']
 
-# config.custom_python_constructor = {
-#     'CitePyExampleNS::IExample': 'def __init__()\n'    'self.__m__ = cpp_m.CitePyExampleNS_IExample.createLibrary()'}
-# config.methods_to_ignore = ['CitePyExampleNS::IExample::createLibrary']
+config.methods_to_ignore = ['CitePyExampleNS::IExample::createLibrary']
+config.custom_methods = {
+    'CitePyExampleNS.IExample': ['def __init__(self):\n\tself.__m__ = cpp_m.CitePyExampleNS_IExample.createLibrary()']}
 
 header = CitePy11(config)
 
