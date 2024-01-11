@@ -109,6 +109,9 @@ namespace py = pybind11;
 
     def add_classes(self, content, classes, namespace_prefix):
         for clas in classes:
+            if clas.class_decl.access is not None and clas.class_decl.access != 'public':
+                continue
+
             name = clas.class_decl.typename.segments[0].name
             full_name = namespace_prefix + name
             prefix = full_name + '::'
