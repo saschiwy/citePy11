@@ -133,7 +133,7 @@ sys.path.append(script_path)
         enum_name = enum.typename.segments[0].name
         full_pybind_name += f'_{enum_name}'
 
-        result = f'class {enum_name}({full_pybind_name}):\n{self.__get_class_docstring__(enum.doxygen)}'
+        result = f'class {enum_name}({full_pybind_name}):\n{self.__get_enum_docstring__(enum.doxygen)}'
 
         for enum_value in enum.values:
             val_name = enum_value.name
@@ -158,7 +158,7 @@ sys.path.append(script_path)
             result = f'class {class_name}({full_pybind_name}):\n'
 
         if c.class_decl.doxygen is not None:
-            doc = create_method_docstring(parse_doxygen_comment(c.class_decl.doxygen))
+            doc = create_docstring(parse_doxygen_comment(c.class_decl.doxygen))
             result += self.__indent__(doc, indent='    ', max_empty_lines=1)
 
         for e in c.enums:
@@ -205,6 +205,12 @@ sys.path.append(script_path)
         if doxygen is None:
             return ''
         doc = create_method_docstring(parse_doxygen_comment(doxygen))
+        return self.__indent__(doc, indent='    ', max_empty_lines=1)
+
+    def __get_enum_docstring__(self, doxygen):
+        if doxygen is None:
+            return ''
+        doc = create_docstring(parse_doxygen_comment(doxygen))
         return self.__indent__(doc, indent='    ', max_empty_lines=1)
 
     def __get_class_methods__(self, methods, namespace, is_virtual):
@@ -256,14 +262,14 @@ sys.path.append(script_path)
                 method_dict[name] = []
 
             method_dict[name].append(
-                {'params': len(m.parameters),
+                {'params': m.parameters,
                  'doc': m.doxygen,
                  'return': m.return_type,
                  'decorator': decorator,
                  'call_prefix': call_prefix})
 
         if not has_constructor and not is_virtual:
-            method_dict['__init__'] = [{'params': 0,
+            method_dict['__init__'] = [{'params': [],
                                         'doc': None,
                                         'return': None,
                                         'decorator': '',
@@ -282,14 +288,13 @@ sys.path.append(script_path)
 
             docs = []
             for p in method_dict[m]:
-                if p['doc'] is not None:
-                    docs.append(parse_doxygen_comment(p['doc']))
+                docs.append([parse_doxygen_comment(p['doc']), p['params']])
             doc_content = create_method_docstring(docs)
             if len(doc_content) > 0:
                 result += self.__indent__(doc_content, indent='    ', max_empty_lines=1)
 
             for p in method_dict[m]:
-                params = p['params']
+                params = len(p['params'])
                 if params in handled_number_of_params:
                     continue
 

@@ -1,4 +1,5 @@
 from citePy11.citepy_config import citepy_config
+from citePy11.citepy_helper import get_cpp_type
 
 
 class CodeDumpCpp:
@@ -180,7 +181,8 @@ namespace py = pybind11;
                 begin += '_static'
 
             if len(self.__get_ref_params__(method.parameters)) > 0:
-                content = self.__add_reference_method__(content, method, name, python_name, begin, namespace_prefix[:-2])
+                content = self.__add_reference_method__(content, method, name, python_name, begin,
+                                                        namespace_prefix[:-2])
             else:
                 content = self.__add_value_method__(content, method, name, python_name, namespace_prefix, begin)
 
@@ -217,32 +219,11 @@ namespace py = pybind11;
 
     def __get_type__(self, segments):
 
-        result = segments[0].name
-        result = self.__add_specialization__(result, segments[0])
-
-        for seg in segments[1:]:
-            result += '::' + seg.name
-            result = self.__add_specialization__(result, seg)
+        result = get_cpp_type(segments)
 
         if result in self.full_names:
             result = self.full_names[result]
 
-        return result
-
-    def __add_specialization__(self, result, segment):
-
-        if not hasattr(segment, 'specialization'):
-            return result
-
-        if segment.specialization is None:
-            return result
-
-        result += '<'
-        for i, arg in enumerate(segment.specialization.args):
-            result += self.__get_type__(arg.arg.typename.segments)
-            if i < len(segment.specialization.args) - 1:
-                result += ', '
-        result += '>'
         return result
 
     def __add_value_method__(self, content, method, name, python_name, namespace_prefix, begin):

@@ -1,3 +1,6 @@
+import cxxheaderparser.types
+from citePy11.citepy_helper import get_cpp_type
+
 tag_start = ['@', '\\']
 comment_start = '/**'
 comment_continue = '*'
@@ -54,6 +57,9 @@ def parse_doxygen_comment(comment):
         'exception': []
     }
 
+    if comment is None:
+        return parsed_data
+
     for multi_tag in multi_tags:
         if multi_tag not in known_tags:
             known_tags.append(multi_tag)
@@ -91,21 +97,8 @@ def parse_doxygen_comment(comment):
     return parsed_data
 
 
-def create_method_docstring(parsed_docs):
-    if len(parsed_docs) == 0:
-        return ''
-
+def __print_parsed_tags__(combined_doc):
     result = '"""\n'
-
-    if not isinstance(parsed_docs, list):
-        parsed_docs = [parsed_docs]
-
-    combined_doc = {}
-    for tag in known_tags:
-        combined_doc[tag] = []
-        for parsed_doc in parsed_docs:
-            if tag in parsed_doc:
-                combined_doc[tag].append(parsed_doc[tag])
 
     for tag in known_tags:
         has_content = False
@@ -131,25 +124,63 @@ def create_method_docstring(parsed_docs):
             else:
                 result += f'{prefix}- {content}\n'
 
-    # for parsed_doc in parsed_docs:
-    #     for tag in known_tags:
-    #
-    #         if tag in parsed_doc:
-    #             if not len(parsed_doc[tag]) > 0:
-    #                 continue
-    #             if len(map_python_to_cpp[tag]) > 0:
-    #                 result += map_python_to_cpp[tag] + '\n'
-    #                 prefix = '    '
-    #             else:
-    #                 prefix = ''
-    #             if tag in multi_tags:
-    #                 for multi_tag in parsed_doc[tag]:
-    #                     result += f'{prefix}- {multi_tag}\n'
-    #             else:
-    #                 result += f'{prefix}{parsed_doc[tag]}\n'
-
     result += '"""\n'
     return result
+
+
+def create_docstring(parsed_docs):
+    if len(parsed_docs) == 0:
+        return ''
+
+    if not isinstance(parsed_docs, list):
+        parsed_docs = [parsed_docs]
+
+    combined_doc = {}
+    for tag in known_tags:
+        combined_doc[tag] = []
+        for parsed_doc in parsed_docs:
+            if tag in parsed_doc:
+                combined_doc[tag].append(parsed_doc[tag])
+
+    return __print_parsed_tags__(combined_doc)
+
+
+def create_method_docstring(parsed_docs):
+    if len(parsed_docs) == 0:
+        return ''
+
+    if not isinstance(parsed_docs, list):
+        parsed_docs = [parsed_docs]
+
+    combined_doc = {}
+    for tag in known_tags:
+        combined_doc[tag] = []
+        for parsed_doc, params in parsed_docs:
+            if tag == 'param':
+                types = []
+                if len(params) == 0:
+                    types.append('(void)')
+
+                for param in params:
+                    if isinstance(param.type, cxxheaderparser.types.Type):
+                        typename = get_cpp_type(param.type.typename.segments)
+                    elif isinstance(param.type, cxxheaderparser.types.Reference):
+                        typename = get_cpp_type(param.type.ref_to.typename.segments)
+                    else:
+                        typename = 'unknown'
+                    # varname = param.name
+                    types.append(f'({typename}) ')
+
+                for i, t in enumerate(types):
+                    if len(parsed_doc['param']) <= i:
+                        parsed_doc['param'].append(t)
+                    else:
+                        parsed_doc['param'][i] = t + ' ' + parsed_doc['param'][i]
+
+            if parsed_doc is not None and tag in parsed_doc:
+                combined_doc[tag].append(parsed_doc[tag])
+
+    return __print_parsed_tags__(combined_doc)
 
 
 def create_field_docstring(parsed_doc):

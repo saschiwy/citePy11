@@ -1,9 +1,19 @@
-# CPP Interface Translation Engine for Pybind11 (CitePy11)
+# C++ Interface Translation Engine for Pybind11 (CitePy11)
 
 ## Introduction
 
 The engine intends to create pybind11 bindings out of a CPP Interface Header and also if desired a python mapper to add
 support for IDE development
+
+## Features
+- Create pybind11 bindings out of a CPP Interface Header
+- Create a python mapper to add support for IDE development and easy to use
+- Adds doxygen comments to the python bindings as docstrings
+- Overloading support
+- Operator overloading support
+- Namespace support
+- Custom method support
+- Custom method ignore support
 
 ## Required Software
 

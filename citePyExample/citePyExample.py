@@ -11,6 +11,14 @@ import __citePyExample__ as cpp_m
 
 class MyInteger(cpp_m.MyInteger):
     def __init__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (void)
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 0:
             super().__init__()
 
@@ -21,6 +29,14 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __init__")
 
     def __add__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 1:
             return super().__add__(args[0])
 
@@ -28,6 +44,14 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __add__")
 
     def __sub__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 1:
             return super().__sub__(args[0])
 
@@ -35,6 +59,14 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __sub__")
 
     def __mul__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 1:
             return super().__mul__(args[0])
 
@@ -42,6 +74,14 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __mul__")
 
     def __truediv__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 1:
             return super().__truediv__(args[0])
 
@@ -49,6 +89,14 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __truediv__")
 
     def __eq__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 1:
             return super().__eq__(args[0])
 
@@ -56,6 +104,14 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __eq__")
 
     def __ne__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 1:
             return super().__ne__(args[0])
 
@@ -63,6 +119,14 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __ne__")
 
     def __lt__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 1:
             return super().__lt__(args[0])
 
@@ -70,6 +134,14 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __lt__")
 
     def __le__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 1:
             return super().__le__(args[0])
 
@@ -77,6 +149,14 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __le__")
 
     def __gt__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 1:
             return super().__gt__(args[0])
 
@@ -84,6 +164,14 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __gt__")
 
     def __ge__(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+          - Variant 1:
+            -- (int) 
+        """
+
         if len(args) == 1:
             return super().__ge__(args[0])
 
@@ -91,6 +179,12 @@ class MyInteger(cpp_m.MyInteger):
             raise Exception("No matching method found for __ge__")
 
     def getValue(self, *args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (void)
+        """
+
         if len(args) == 0:
             return super().getValue()
 
@@ -99,6 +193,13 @@ class MyInteger(cpp_m.MyInteger):
 
     @staticmethod
     def add(*args):
+        """
+        Parameter:
+          - Variant 0:
+            -- (MyInteger) 
+            -- (MyInteger) 
+        """
+
         if len(args) == 2:
             return cpp_m.MyInteger.add(args[0], args[1])
 
@@ -136,6 +237,12 @@ class SecondNamespace:
             super(SecondNamespace.ExternalStruct, SecondNamespace.ExternalStruct).listWithNumbersToAdd.__set__(self, value)
 
         def __init__(self, *args):
+            """
+            Parameter:
+              - Variant 0:
+                -- (void)
+            """
+
             if len(args) == 0:
                 super().__init__()
 
@@ -152,6 +259,12 @@ class SecondNamespace:
             super(SecondNamespace.ExternalStruct2, SecondNamespace.ExternalStruct2).testEnum.__set__(self, value)
 
         def __init__(self, *args):
+            """
+            Parameter:
+              - Variant 0:
+                -- (void)
+            """
+
             if len(args) == 0:
                 super().__init__()
 
@@ -196,9 +309,10 @@ class CitePyExampleNS:
               - Constructor
             Parameter:
               - Variant 0:
+                -- (void)
               - Variant 1:
-                -- left    The left.
-                -- right   The right.
+                -- (double)  left    The left.
+                -- (double)  right   The right.
             Function:
               - ExampleStruct();
               - ExampleStruct(double left, double right);
@@ -214,6 +328,13 @@ class CitePyExampleNS:
                 raise Exception("No matching method found for __init__")
 
         def set(self, *args):
+            """
+            Parameter:
+              - Variant 0:
+                -- (T) 
+                -- (T) 
+            """
+
             if len(args) == 2:
                 return super().set(args[0], args[1])
 
@@ -221,6 +342,12 @@ class CitePyExampleNS:
                 raise Exception("No matching method found for set")
 
         def getLeft(self, *args):
+            """
+            Parameter:
+              - Variant 0:
+                -- (void)
+            """
+
             if len(args) == 0:
                 return super().getLeft()
 
@@ -237,8 +364,8 @@ class CitePyExampleNS:
               - Adds two doubles
             Parameter:
               - Variant 0:
-                -- left    The left.
-                -- right   The right.
+                -- (double)  left    The left.
+                -- (double)  right   The right.
             Returns:
               - the result.
             Function:
@@ -256,8 +383,8 @@ class CitePyExampleNS:
               - Subtracts two doubles
             Parameter:
               - Variant 0:
-                -- left    The left.
-                -- right   The right.
+                -- (double)  left    The left.
+                -- (double)  right   The right.
             Returns:
               - the result.
             Function:
@@ -277,12 +404,12 @@ class CitePyExampleNS:
               - Computes the given values
             Parameter:
               - Variant 0:
-                -- option  The option.
-                -- values  The values.
+                -- (ExampleEnum)  option  The option.
+                -- (ExampleStruct)  values  The values.
               - Variant 1:
-                -- values  The values.
+                -- (std::vector<double>)  values  The values.
               - Variant 2:
-                -- values  The values.
+                -- (SecondNamespace::ExternalStruct)  values  The values.
             Returns:
               - the result.
               - A double.
@@ -307,7 +434,7 @@ class CitePyExampleNS:
               - Registers the callback described by cb
             Parameter:
               - Variant 0:
-                -- cb  The cb.
+                -- (ExampleCallbackDefinition)  cb  The cb.
             Function:
               - virtual void IExample::registerCallback(ExampleCallbackDefinition cb) = 0;
             """
@@ -323,9 +450,9 @@ class CitePyExampleNS:
               - Adds a referenced
             Parameter:
               - Variant 0:
-                -- [in,out]  result  The result.
-                -- left    The left.
-                -- right   The right.
+                -- (double)  [in,out]  result  The result.
+                -- (double)  left    The left.
+                -- (double)  right   The right.
             Function:
               - virtual void IExample::addReferenced(double& result, double left, double right) = 0;
             """
