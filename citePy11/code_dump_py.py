@@ -173,7 +173,7 @@ sys.path.append(script_path)
             result += self.__indent__(field_lines, indent='    ', max_empty_lines=1)
 
         for c in c.classes:
-            if c.access != 'public':
+            if hasattr(c, 'access') and c.access != 'public':
                 continue
 
             class_lines = self.__create_class__(c, full_pybind_name, full_python_name)

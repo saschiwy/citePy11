@@ -206,6 +206,11 @@ namespace py = pybind11;
                 if arg.type.ref_to.const:
                     t = 'const ' + t
 
+            elif hasattr(arg.type, 'ptr_to'):
+                t = self.__get_type__(arg.type.ptr_to.typename.segments) + '*'
+                if arg.type.ptr_to.const:
+                    t = 'const ' + t
+
             else:
                 raise Exception('Unknown type')
 
