@@ -164,8 +164,19 @@ def create_method_docstring(parsed_docs):
                 for param in params:
                     if isinstance(param.type, cxxheaderparser.types.Type):
                         typename = get_cpp_type(param.type.typename.segments)
+                        if param.type.const:
+                            typename = 'const ' + typename
+
                     elif isinstance(param.type, cxxheaderparser.types.Reference):
-                        typename = get_cpp_type(param.type.ref_to.typename.segments)
+                        typename = get_cpp_type(param.type.ref_to.typename.segments) + '&'
+                        if param.type.ref_to.const:
+                            typename = 'const ' + typename
+
+                    elif isinstance(param.type, cxxheaderparser.types.Pointer):
+                        typename = get_cpp_type(param.type.ptr_to.typename.segments) + '*'
+                        if param.type.ptr_to.const:
+                            typename = 'const ' + typename
+
                     else:
                         typename = 'unknown'
                     # varname = param.name

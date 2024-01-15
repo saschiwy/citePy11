@@ -142,6 +142,9 @@ sys.path.append(script_path)
         return result
 
     def __create_class__(self, c, full_pybind_name, python_namespace):
+        if c.class_decl.access is not None and c.class_decl.access != 'public':
+            return ''
+
         class_name = c.class_decl.typename.segments[0].name
 
         if len(full_pybind_name) > 0 and full_pybind_name[-1] != '.':
@@ -173,7 +176,7 @@ sys.path.append(script_path)
             result += self.__indent__(field_lines, indent='    ', max_empty_lines=1)
 
         for c in c.classes:
-            if c.access != 'public':
+            if hasattr(c, 'access') and c.access != 'public':
                 continue
 
             class_lines = self.__create_class__(c, full_pybind_name, full_python_name)

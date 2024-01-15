@@ -105,6 +105,9 @@ namespace py = pybind11;
 
     def add_classes(self, content, classes, namespace_prefix):
         for clas in classes:
+            if clas.class_decl.access is not None and clas.class_decl.access != 'public':
+                continue
+
             name = clas.class_decl.typename.segments[0].name
             full_name = namespace_prefix + name
             prefix = full_name + '::'
@@ -200,6 +203,11 @@ namespace py = pybind11;
 
             elif hasattr(arg.type, 'ref_to'):
                 t = 'const ' + self.__get_type__(arg.type.ref_to.typename.segments) + '&'
+
+            elif hasattr(arg.type, 'ptr_to'):
+                t = self.__get_type__(arg.type.ptr_to.typename.segments) + '*'
+                if arg.type.ptr_to.const:
+                    t = 'const ' + t
 
             else:
                 raise Exception('Unknown type')
