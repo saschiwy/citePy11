@@ -62,13 +62,6 @@ namespace CitePyExampleNS
     };
 
     /*!
-     * \typedef std::function<void(double)> ExampleCallbackDefinition
-     *
-     * \brief   Defines an alias representing the example callback definition
-     */
-    typedef std::function<void(double)> ExampleCallbackDefinition;
-
-    /*!
      * \class   IExample
      *
      * \brief   An example class to show the usage ot citePy
@@ -76,6 +69,13 @@ namespace CitePyExampleNS
     class IExample
     {
     public:
+        /*!
+         * \typedef std::function<void(double)> ExampleCallbackDefinition
+         *
+         * \brief   Defines an alias representing the example callback definition
+         */
+        typedef std::function<void(double)> ExampleCallbackDefinition;
+
         virtual ~IExample() = default;
 
         /*!

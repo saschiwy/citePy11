@@ -79,10 +79,6 @@ namespace py = pybind11;
     
     """
 
-    def add_namespace(self, content, namespace):
-        content += 'namespace ' + namespace + ' {\n'
-        return content
-
     def close_module(self, content):
         return content + '}\n'
 
@@ -114,6 +110,7 @@ namespace py = pybind11;
             prefix = full_name + '::'
             self.full_names[name] = full_name
 
+            self.find_typedefs(clas, prefix)
             content = self.add_enums(content, clas.enums, prefix)
             content = self.add_classes(content, clas.classes, prefix)
 
@@ -202,9 +199,7 @@ namespace py = pybind11;
                     t = 'const ' + t
 
             elif hasattr(arg.type, 'ref_to'):
-                t = self.__get_type__(arg.type.ref_to.typename.segments) + '&'
-                if arg.type.ref_to.const:
-                    t = 'const ' + t
+                t = 'const ' + self.__get_type__(arg.type.ref_to.typename.segments) + '&'
 
             else:
                 raise Exception('Unknown type')

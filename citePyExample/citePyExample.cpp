@@ -55,8 +55,8 @@ py::class_<CitePyExampleNS::IExample> (m, "CitePyExampleNS_IExample")
 .def("compute", py::overload_cast<CitePyExampleNS::ExampleEnum, CitePyExampleNS::ExampleStruct>(&CitePyExampleNS::IExample::compute))
 .def("compute", py::overload_cast<const std::vector<double>&>(&CitePyExampleNS::IExample::compute))
 .def("compute", py::overload_cast<SecondNamespace::ExternalStruct>(&CitePyExampleNS::IExample::compute))
-.def("registerCallback", py::overload_cast<CitePyExampleNS::ExampleCallbackDefinition>(&CitePyExampleNS::IExample::registerCallback))
-.def("addReferenced", [](CitePyExampleNS::IExample& self, double& result, double left, double right) {auto __result = result; self.addReferenced(__result, left, right); return __result;})
+.def("registerCallback", py::overload_cast<CitePyExampleNS::IExample::ExampleCallbackDefinition>(&CitePyExampleNS::IExample::registerCallback))
+.def("addReferenced", [](CitePyExampleNS::IExample& self, const double& result, double left, double right) {auto __result = result; self.addReferenced(__result, left, right); return __result;})
 ;
 
 py::class_<MyInteger> (m, "MyInteger")
