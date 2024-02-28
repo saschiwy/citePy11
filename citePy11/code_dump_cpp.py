@@ -52,7 +52,6 @@ class CodeDumpCpp:
             result += f'#include "{header_file}"\n'
 
         result += """    
-
 namespace py = pybind11;
 
 """
@@ -145,7 +144,12 @@ namespace py = pybind11;
 
         for method in methods:
             name = method.name.segments[0].name
-            if method.pure_virtual:
+
+            full_name = namespace_prefix + name
+            if full_name in self.config.methods_to_ignore:
+                continue
+
+            if method.virtual:
                 is_virtual = True
 
             if method.access != 'public':
@@ -184,7 +188,8 @@ namespace py = pybind11;
                 content = self.__add_reference_method__(content, method, name, python_name, begin,
                                                         namespace_prefix[:-2])
             else:
-                content = self.__add_value_method__(content, method, name, python_name, namespace_prefix, begin)
+                content = self.__add_value_method__(content, method, name, python_name, namespace_prefix, begin,
+                                                    namespace_prefix[:-2])
 
         if not has_constructor and not is_virtual:
             content += '.def(py::init<>())'
@@ -226,18 +231,29 @@ namespace py = pybind11;
 
         if result in self.full_names:
             result = self.full_names[result]
+            return result
+
+        if result.split('::')[-1] in self.full_names:
+            result = self.full_names[result.split('::')[-1]]
+            return result
 
         return result
 
-    def __add_value_method__(self, content, method, name, python_name, namespace_prefix, begin):
-        content += begin + '("' + python_name + '", py::overload_cast<'
-        content += self.__add_parameters__(method.parameters, types_only=True)
-        content += '>(&' + namespace_prefix + name
+    def __add_value_method__(self, content, method, name, python_name, namespace_prefix, begin, class_name):
+        content += begin + '("' + python_name + '", [](' + class_name + '& self'
+        if len(method.parameters) > 0:
+            content += ', ' + self.__add_parameters__(method.parameters, types_only=False)
+        content += ') {return self.' + name + '('
 
-        if method.const:
-            content += ', py::const_'
+        param_names = self.__get_param_names__(method.parameters)
+        for i, arg in enumerate(param_names):
+            content += arg
+            if i < len(param_names) - 1:
+                content += ', '
 
-        content += self.__add_description__(method.doxygen) + '))\n'
+        content += ');}'
+
+        content += self.__add_description__(method.doxygen) + ')\n'
         return content
 
     def __get_ref_params__(self, parameters):

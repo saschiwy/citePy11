@@ -58,6 +58,11 @@ namespace CitePyExampleNS
             right = static_cast<double>(val2);
         }
 
+        void set(double val1)
+        {
+            left = val1;
+        }
+
         double getLeft() const;
     };
 

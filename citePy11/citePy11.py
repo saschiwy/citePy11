@@ -78,9 +78,9 @@ class CitePy11:
 
         result = self.__add_namespace__(result, content, namespace_prefix)
 
-        for namespace in content.namespaces:
-            t = content.namespaces[namespace]
-            result = self.__add_namespace__(result, t, namespace_prefix + namespace + '::')
+        # for namespace in content.namespaces:
+        #     t = content.namespaces[namespace]
+        #     result = self.__add_namespace__(result, t, namespace_prefix + namespace + '::')
 
         return result
 
@@ -89,6 +89,9 @@ class CitePy11:
         result = self.dump_cpp.add_enums(result, content.enums, namespace_prefix)
         result = self.dump_cpp.add_functions(result, content.functions, namespace_prefix)
         result = self.dump_cpp.add_classes(result, content.classes, namespace_prefix)
+        for namespace in content.namespaces:
+            t = content.namespaces[namespace]
+            result = self.__add_namespace__(result, t, namespace_prefix + namespace + '::')
         return result
 
     def create_python(self, module_name):

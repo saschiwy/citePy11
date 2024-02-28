@@ -32,9 +32,9 @@ class MyInteger(cpp_m.MyInteger):
         """
         Parameter:
           - Variant 0:
-            -- (MyInteger) 
+            -- (const MyInteger&) 
           - Variant 1:
-            -- (int) 
+            -- (const int&) 
         """
 
         if len(args) == 1:
@@ -47,9 +47,9 @@ class MyInteger(cpp_m.MyInteger):
         """
         Parameter:
           - Variant 0:
-            -- (MyInteger) 
+            -- (const MyInteger&) 
           - Variant 1:
-            -- (int) 
+            -- (const int&) 
         """
 
         if len(args) == 1:
@@ -62,9 +62,9 @@ class MyInteger(cpp_m.MyInteger):
         """
         Parameter:
           - Variant 0:
-            -- (MyInteger) 
+            -- (const MyInteger&) 
           - Variant 1:
-            -- (int) 
+            -- (const int&) 
         """
 
         if len(args) == 1:
@@ -77,9 +77,9 @@ class MyInteger(cpp_m.MyInteger):
         """
         Parameter:
           - Variant 0:
-            -- (MyInteger) 
+            -- (const MyInteger&) 
           - Variant 1:
-            -- (int) 
+            -- (const int&) 
         """
 
         if len(args) == 1:
@@ -92,9 +92,9 @@ class MyInteger(cpp_m.MyInteger):
         """
         Parameter:
           - Variant 0:
-            -- (MyInteger) 
+            -- (const MyInteger&) 
           - Variant 1:
-            -- (int) 
+            -- (const int&) 
         """
 
         if len(args) == 1:
@@ -107,9 +107,9 @@ class MyInteger(cpp_m.MyInteger):
         """
         Parameter:
           - Variant 0:
-            -- (MyInteger) 
+            -- (const MyInteger&) 
           - Variant 1:
-            -- (int) 
+            -- (const int&) 
         """
 
         if len(args) == 1:
@@ -122,9 +122,9 @@ class MyInteger(cpp_m.MyInteger):
         """
         Parameter:
           - Variant 0:
-            -- (MyInteger) 
+            -- (const MyInteger&) 
           - Variant 1:
-            -- (int) 
+            -- (const int&) 
         """
 
         if len(args) == 1:
@@ -137,9 +137,9 @@ class MyInteger(cpp_m.MyInteger):
         """
         Parameter:
           - Variant 0:
-            -- (MyInteger) 
+            -- (const MyInteger&) 
           - Variant 1:
-            -- (int) 
+            -- (const int&) 
         """
 
         if len(args) == 1:
@@ -152,9 +152,9 @@ class MyInteger(cpp_m.MyInteger):
         """
         Parameter:
           - Variant 0:
-            -- (MyInteger) 
+            -- (const MyInteger&) 
           - Variant 1:
-            -- (int) 
+            -- (const int&) 
         """
 
         if len(args) == 1:
@@ -167,9 +167,9 @@ class MyInteger(cpp_m.MyInteger):
         """
         Parameter:
           - Variant 0:
-            -- (MyInteger) 
+            -- (const MyInteger&) 
           - Variant 1:
-            -- (int) 
+            -- (const int&) 
         """
 
         if len(args) == 1:
@@ -333,10 +333,15 @@ class CitePyExampleNS:
               - Variant 0:
                 -- (T) 
                 -- (T) 
+              - Variant 1:
+                -- (double) 
             """
 
             if len(args) == 2:
                 return super().set(args[0], args[1])
+
+            elif len(args) == 1:
+                return super().set(args[0])
 
             else:
                 raise Exception("No matching method found for set")
@@ -407,7 +412,7 @@ class CitePyExampleNS:
                 -- (ExampleEnum)  option  The option.
                 -- (ExampleStruct)  values  The values.
               - Variant 1:
-                -- (std::vector<double>)  values  The values.
+                -- (const std::vector<double>&)  values  The values.
               - Variant 2:
                 -- (SecondNamespace::ExternalStruct)  values  The values.
             Returns:
@@ -450,7 +455,7 @@ class CitePyExampleNS:
               - Adds a referenced
             Parameter:
               - Variant 0:
-                -- (double)  [in,out]  result  The result.
+                -- (double&)  [in,out]  result  The result.
                 -- (double)  left    The left.
                 -- (double)  right   The right.
             Function:
