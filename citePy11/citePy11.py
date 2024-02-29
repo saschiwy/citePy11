@@ -78,10 +78,6 @@ class CitePy11:
 
         result = self.__add_namespace__(result, content, namespace_prefix)
 
-        # for namespace in content.namespaces:
-        #     t = content.namespaces[namespace]
-        #     result = self.__add_namespace__(result, t, namespace_prefix + namespace + '::')
-
         return result
 
     def __add_namespace__(self, result, content, namespace_prefix):

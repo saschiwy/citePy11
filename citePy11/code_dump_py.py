@@ -94,18 +94,14 @@ sys.path.append(script_path)
     def __get_python_namespace__(self, content, parent_namespace=''):
         namespace_name = content.name
 
-        if len(parent_namespace) > 0:
-            full_namespace = f'{parent_namespace}.{namespace_name}'
-            namespace_nesting = len(full_namespace.split('.')) * '    '
-            indent = '    '
-
-        elif len(namespace_name) > 0:
+        if parent_namespace == '':
             full_namespace = namespace_name
-            namespace_nesting = ''
+        else:
+            full_namespace = parent_namespace + '.' + namespace_name
+
+        if len(namespace_name) > 0:
             indent = '    '
         else:
-            full_namespace = ''
-            namespace_nesting = ''
             indent = ''
 
         result = ''
@@ -125,7 +121,7 @@ sys.path.append(script_path)
         for namespace in content.namespaces:
             t = content.namespaces[namespace]
             namespace_lines = self.__get_python_namespace__(t, full_namespace)
-            result += self.__indent__(namespace_lines, indent=namespace_nesting, max_empty_lines=1)
+            result += self.__indent__(namespace_lines, indent=indent, max_empty_lines=1)
 
         return result
 

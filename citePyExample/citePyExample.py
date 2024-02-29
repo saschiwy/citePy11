@@ -271,6 +271,48 @@ class SecondNamespace:
             else:
                 raise Exception("No matching method found for __init__")
 
+class four:
+    class namespaces:
+        class at:
+            class once:
+                class ExternalStruct3(cpp_m.four_namespaces_at_once_ExternalStruct3):
+                    @property
+                    def testInt(self):
+                        return super(four.namespaces.at.once.ExternalStruct3, four.namespaces.at.once.ExternalStruct3).testInt.__get__(self)
+
+                    @testInt.setter
+                    def testInt(self, value):
+                        super(four.namespaces.at.once.ExternalStruct3, four.namespaces.at.once.ExternalStruct3).testInt.__set__(self, value)
+
+                    def setTestInt(self, *args):
+                        """
+                          - Set the testInt value
+                        Parameter:
+                          - Variant 0:
+                            -- (int)  value
+                        Returns:
+                          - int
+                        """
+
+                        if len(args) == 1:
+                            return super().setTestInt(args[0])
+
+                        else:
+                            raise Exception("No matching method found for setTestInt")
+
+                    def __init__(self, *args):
+                        """
+                        Parameter:
+                          - Variant 0:
+                            -- (void)
+                        """
+
+                        if len(args) == 0:
+                            super().__init__()
+
+                        else:
+                            raise Exception("No matching method found for __init__")
+
 class CitePyExampleNS:
     class ExampleEnum(cpp_m.CitePyExampleNS_ExampleEnum):
         """

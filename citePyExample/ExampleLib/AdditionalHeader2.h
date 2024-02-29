@@ -14,4 +14,24 @@ namespace SecondNamespace
         ExternalStruct::Test testEnum{};
     };
 }
+
+namespace four::namespaces::at::once
+{
+    struct ExternalStruct3
+    {
+        int testInt{};
+
+        /**
+         * @brief Set the testInt value
+         *
+         * @param value
+         * @return int
+         */
+        int setTestInt(int value)
+        {
+            testInt = value;
+            return testInt;
+        }
+    };
+}
 #endif //ADDITIONALHEADER2_H

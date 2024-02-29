@@ -34,6 +34,11 @@ py::class_<SecondNamespace::ExternalStruct2> (m, "SecondNamespace_ExternalStruct
 .def_readwrite("testEnum", &SecondNamespace::ExternalStruct2::testEnum)
 .def(py::init<>());
 
+py::class_<four::namespaces::at::once::ExternalStruct3> (m, "four_namespaces_at_once_ExternalStruct3")
+.def_readwrite("testInt", &four::namespaces::at::once::ExternalStruct3::testInt)
+.def("setTestInt", [](four::namespaces::at::once::ExternalStruct3& self, int value) {return self.setTestInt(value);})
+.def(py::init<>());
+
 py::enum_<CitePyExampleNS::ExampleEnum> (m, "CitePyExampleNS_ExampleEnum")
 	.value("add", CitePyExampleNS::ExampleEnum::add)
 	.value("subtract", CitePyExampleNS::ExampleEnum::subtract)

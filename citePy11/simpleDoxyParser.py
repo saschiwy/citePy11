@@ -6,7 +6,7 @@ comment_start = '/**'
 comment_continue = '*'
 comment_end = '*/'
 
-known_tags = ['brief', 'param', 'returns', 'fn']
+known_tags = ['brief', 'param', 'returns', 'fn', 'return']
 multi_tags = ['param', 'exception', 'note', 'warning']
 
 field_comments = ['///<', '//!<', '//!', '///']
@@ -18,7 +18,8 @@ map_python_to_cpp = {
     'fn': 'Function:',
     'exception': 'Raises:',
     'note': 'Notes:',
-    'warning': 'Warnings:'
+    'warning': 'Warnings:',
+    'return': 'Returns:'
 }
 
 
